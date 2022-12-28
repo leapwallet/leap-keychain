@@ -18,7 +18,8 @@
     "doc:build": "yarn doc",
     "doc:watch": "yarn doc --watch",
     "prepublish": "yarn build",
-    "build": "tsc"
+    "build": "tsc",
+    "test:coverage": "jest --coverage"
   },
   "jest": {
     "preset": "ts-jest",
@@ -48,24 +49,26 @@
   ],
   "browser": "dist/src/index.js",
   "dependencies": {
-    "@ethersproject/bytes": "^5.7.0",
-    "@ethersproject/wallet": "^5.7.0",
-    "@noble/hashes": "^1.1.5",
-    "@noble/secp256k1": "^1.7.0",
-    "@scure/bip32": "^1.1.1",
-    "base64-js": "^1.5.1",
-    "bech32": "^2.0.0",
+    "@ethersproject/bytes": "5.7.0",
+    "@ethersproject/wallet": "5.7.0",
+    "@noble/hashes": "1.1.5",
+    "@noble/secp256k1": "1.7.0",
+    "@scure/bip32": "1.1.1",
+    "base64-js": "1.5.1",
+    "bech32": "2.0.0",
     "bip32": "2.0.6",
-    "bip39": "^3.0.4",
-    "cosmjs-types": "^0.6.1",
+    "bip39": "3.0.4",
+    "cosmjs-types": "0.6.1",
     "cross-fetch": "3.1.5",
-    "crypto-js": "^4.1.1",
-    "ethereumjs-util": "^7.1.5",
-    "typedi": "0.10.0"
+    "crypto-js": "4.1.1",
+    "ethereumjs-util": "7.1.5",
+    "typedi": "0.10.0",
+    "uuid": "9.0.0"
   },
   "devDependencies": {
     "@types/crypto-js": "4.1.1",
     "@types/jest": "28.1.4",
+    "@types/uuid": "^9.0.0",
     "@typescript-eslint/eslint-plugin": "5.9.1",
     "@typescript-eslint/parser": "5.9.1",
     "eslint": "8.6.0",

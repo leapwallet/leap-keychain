@@ -20,7 +20,13 @@ jobs:
         with:
           node-version: 16
       - run: yarn
-      - run: yarn test
+      - run: yarn test:coverage
+
+      - name: Comment Test Coverage
+        uses: raulanatol/jest-coverage-comment-action@main
+        with:
+          github-token: ${{ secrets.NODE_AUTH_TOKEN }}
+          use-existing-reports: true
   host-docs:
     if: github.ref == 'refs/heads/main'
     needs: [lint, test]

@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "experimentalDecorators": true,
+    "experimentalDecorators": true,
     "outDir": "dist",
     "incremental": true,
     "target": "es6",

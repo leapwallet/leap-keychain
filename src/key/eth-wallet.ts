@@ -1,17 +1,35 @@
-import { WalletOptions } from './types/wallet';
+import { WalletOptions } from '../types/wallet';
 import { Wallet } from '@ethersproject/wallet';
 import { Address as EthereumUtilsAddress } from 'ethereumjs-util/dist/address';
 import { bech32 } from 'bech32';
 import { keccak256 } from 'ethereumjs-util';
 import * as bytes from '@ethersproject/bytes';
-import { fromHex } from './utils/encoding';
-import { StdSignDoc } from './types/tx';
+import { fromHex } from '../utils/encoding';
+import { StdSignDoc } from '../types/tx';
 import { sha256 } from '@noble/hashes/sha256';
-import { serializeStdSignDoc } from './utils/serialize-signdoc';
-import { encodeSecp256k1Signature } from './utils/encode-signature';
+import { serializeStdSignDoc } from '../utils/serialize-signdoc';
+import { encodeSecp256k1Signature } from '../utils/encode-signature';
 
 export class EthWallet {
-  constructor(private mnemonic: string, private options: WalletOptions) {}
+  private readonly mnemonic: string;
+  private readonly options: WalletOptions;
+  private readonly walletType: 'mnemonic' | 'pvtKey';
+  private readonly pvtKey: string;
+
+  protected constructor(mnemonic: string, pvtKey: string, walletType: 'mnemonic' | 'pvtKey', options: WalletOptions) {
+    this.mnemonic = mnemonic;
+    this.options = options;
+    this.walletType = walletType;
+    this.pvtKey = pvtKey;
+  }
+
+  static generateWalletFromMnemonic(mnemonic: string, options: WalletOptions) {
+    return new EthWallet(mnemonic, '', 'mnemonic', options);
+  }
+
+  static generateWalletFromPvtKey(pvtKey: string, options: WalletOptions) {
+    return new EthWallet('', pvtKey.replace('0x', ''), 'pvtKey', options);
+  }
 
   getAccounts() {
     const accountsWithPrivKey = this.getAccountsWithPrivKey();
@@ -19,14 +37,15 @@ export class EthWallet {
       return {
         algo: account.algo,
         address: account.address,
-        pubKey: account.pubKey,
+        pubkey: account.pubkey,
       };
     });
   }
 
   private getAccountsWithPrivKey() {
     return this.options.paths.map((path) => {
-      const ethWallet = Wallet.fromMnemonic(this.mnemonic, path);
+      const ethWallet =
+        this.walletType === 'mnemonic' ? Wallet.fromMnemonic(this.mnemonic, path) : new Wallet(this.pvtKey);
       const address = ethWallet.address.toString();
       const addressBuffer = EthereumUtilsAddress.fromString(address).toBuffer();
       const bech32Address = bech32.encode(this.options.addressPrefix, bech32.toWords(addressBuffer));
@@ -34,7 +53,7 @@ export class EthWallet {
         algo: 'ethsecp256k1',
         address: bech32Address,
         ethWallet: ethWallet,
-        pubKey: fromHex(ethWallet._signingKey().compressedPublicKey.replace('0x', '')),
+        pubkey: fromHex(ethWallet._signingKey().compressedPublicKey.replace('0x', '')),
       };
     });
   }
@@ -67,7 +86,7 @@ export class EthWallet {
     const signature = EthWallet.signMessage(account.ethWallet, hash);
     return {
       signed: signDoc,
-      signature: encodeSecp256k1Signature(account.pubKey, signature),
+      signature: encodeSecp256k1Signature(account.pubkey, signature),
     };
   }
 
@@ -82,7 +101,7 @@ export class EthWallet {
     const signature = EthWallet.signMessage(account.ethWallet, hash);
     return {
       signed: signDoc,
-      signature: encodeSecp256k1Signature(account.pubKey, signature),
+      signature: encodeSecp256k1Signature(account.pubkey, signature),
     };
   }
 }
