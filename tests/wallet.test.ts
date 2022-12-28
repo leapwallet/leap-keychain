@@ -3,7 +3,7 @@ import { chainInfos, mnemonic, referenceWallets } from './mockdata';
 
 describe('generateMnemonic', () => {
   test('generates a mnemonic', () => {
-    const chainData = Object.entries(chainInfos).filter(([,chainInfo]) => chainInfo.coinType !== 60);
+    const chainData = Object.entries(chainInfos).filter(([, chainInfo]) => chainInfo.coinType !== 60);
 
     for (const [key, chainInfo] of chainData) {
       const path = `m/44'/${chainInfo.coinType}'/0'/0/0`;

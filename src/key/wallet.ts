@@ -139,7 +139,7 @@ export class PvtKeyWallet {
     const signature = await secp256k1.sign(hash, this.privateKey, {
       extraEntropy: true,
       der: false,
-    })
+    });
 
     return {
       signed: signDoc,

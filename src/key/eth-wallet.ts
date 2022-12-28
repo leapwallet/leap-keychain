@@ -11,17 +11,12 @@ import { serializeStdSignDoc } from '../utils/serialize-signdoc';
 import { encodeSecp256k1Signature } from '../utils/encode-signature';
 
 export class EthWallet {
-  private readonly mnemonic: string;
-  private readonly options: WalletOptions;
-  private readonly walletType: 'mnemonic' | 'pvtKey';
-  private readonly pvtKey: string;
-
-  protected constructor(mnemonic: string, pvtKey: string, walletType: 'mnemonic' | 'pvtKey', options: WalletOptions) {
-    this.mnemonic = mnemonic;
-    this.options = options;
-    this.walletType = walletType;
-    this.pvtKey = pvtKey;
-  }
+  protected constructor(
+    private mnemonic: string,
+    private pvtKey: string,
+    private walletType: 'mnemonic' | 'pvtKey',
+    private options: WalletOptions,
+  ) {}
 
   static generateWalletFromMnemonic(mnemonic: string, options: WalletOptions) {
     return new EthWallet(mnemonic, '', 'mnemonic', options);

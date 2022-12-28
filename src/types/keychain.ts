@@ -17,3 +17,18 @@ export type Key<T extends string> = {
 };
 
 export type Keystore<T extends string> = Record<string, Key<T>>;
+
+export type CreateWalletParams = {
+  name: string;
+  mnemonic: string;
+  password: string;
+  addressIndex: number;
+  colorIndex: number;
+  chainInfos: ChainInfo[];
+};
+
+export type ChainInfo = {
+  key: string;
+  addressPrefix: string;
+  coinType: string;
+};

@@ -4,16 +4,16 @@ import { PvtKeyWallet, Wallet } from '../key/wallet';
 import * as secp256k1 from 'secp256k1';
 import * as base64js from 'base64-js';
 import { Container } from 'typedi';
-import { chainInfoToken } from './chainInfos';
 import { decrypt, encrypt } from '../encryption-utils/encryption-utils';
 import { storageToken } from '../storage/storagelayer';
 import { v4 as uuidv4 } from 'uuid';
 import { correctMnemonic } from '../utils/correct-mnemonic';
-import { Key, Keystore, WALLETTYPE } from '../types/keychain';
+import { ChainInfo, CreateWalletParams, Key, Keystore, WALLETTYPE } from '../types/keychain';
 
 const KEYCHAIN = 'keystore';
 const ACTIVE_WALLET = 'active-wallet';
 
+//TODO: move to wallet utils
 function generateWalletFromMnemonic(mnemonic: string, hdPath: string, addressPrefix: string) {
   const hdPathParams = hdPath.split('/');
   const coinType = hdPathParams[2];
@@ -23,6 +23,7 @@ function generateWalletFromMnemonic(mnemonic: string, hdPath: string, addressPre
   return Wallet.generateWallet(mnemonic, { paths: [hdPath], addressPrefix });
 }
 
+//TODO: move to wallet utils
 export async function generateWalletsFromMnemonic(mnemonic: string, paths: string[], prefix: string): Promise<Wallet> {
   const coinTypes = paths.map((hdPath) => {
     const pathParams = hdPath.split('/');
@@ -38,67 +39,22 @@ export async function generateWalletsFromMnemonic(mnemonic: string, paths: strin
   return new Promise((resolve) => resolve(Wallet.generateWallet(mnemonic, { paths, addressPrefix: prefix })));
 }
 
+//TODO: move to utils
 function compressPubicKey(publicKey: Uint8Array) {
   return base64js.fromByteArray(secp256k1.publicKeyConvert(publicKey, true));
 }
 
-type CreateWalletParams = {
-  name: string;
-  mnemonic: string;
-  password: string;
-  addressIndex: number;
-  colorIndex: number;
-};
-
 export class KeyChain {
-  private static async getAllWallets<T extends string>() {
-    const storage = Container.get(storageToken);
-    const keyStore = storage.get(KEYCHAIN) as unknown as Keystore<T>;
-    return keyStore;
-  }
-
-  private static async getAddresses(
-    mnemonic: string,
-    addressIndex: number,
-    chainInfos: { coinType: string; addressPrefix: string; key: string }[],
-  ) {
-    try {
-      const chainsData = chainInfos;
-      const addresses: Record<string, string> = {};
-      const pubKeys: Record<string, string> = {};
-      for (const chainInfo of chainsData) {
-        const wallet = await generateWalletFromMnemonic(
-          mnemonic,
-          getHDPath(chainInfo.coinType, addressIndex.toString()),
-          chainInfo.addressPrefix,
-        );
-
-        const [account] = await wallet.getAccounts();
-        if (account?.address && account?.pubkey) {
-          addresses[chainInfo.key] = account.address;
-          pubKeys[chainInfo.key] = compressPubicKey(account.pubkey);
-        }
-      }
-      return { addresses, pubKeys };
-    } catch (e) {
-      throw new Error((e as Error).message);
-    }
-  }
-
-  private static isWalletAlreadyPresent<T extends string>(address: string, wallets: Key<T>[]) {
-    return wallets.find((wallet) => Object.values(wallet.addresses).includes(address)) !== undefined;
-  }
-
   public static async createWalletUsingMnemonic<T extends string>({
     name,
     mnemonic,
     password,
     addressIndex,
     colorIndex,
+    chainInfos,
   }: CreateWalletParams): Promise<Key<T>> {
     const allWallets = (await KeyChain.getAllWallets()) ?? {};
     const walletsData = Object.values(allWallets);
-    const chainInfos = Container.get(chainInfoToken);
 
     const { addresses, pubKeys } = await KeyChain.getAddresses(mnemonic, addressIndex, chainInfos);
     const walletId = uuidv4();
@@ -131,8 +87,12 @@ export class KeyChain {
     return wallet;
   }
 
-  static async createNewWalletAccount<T extends string>(name: string, password: string, colorIndex: number): Promise<Key<T>> {
-    const chainInfos = Container.get(chainInfoToken);
+  public static async createNewWalletAccount<T extends string>(
+    name: string,
+    password: string,
+    colorIndex: number,
+    chainInfos: ChainInfo[],
+  ): Promise<Key<T>> {
     const wallets = await KeyChain.getAllWallets();
     const walletsData = Object.values(wallets);
     const lastIndex = walletsData
@@ -172,18 +132,23 @@ export class KeyChain {
     return wallet;
   }
 
-  static async importNewWallet<T extends string>(
+  public static async importNewWallet<T extends string>(
     privateKey: string,
     password: string,
+    chainInfos: ChainInfo[],
     addressIndex?: number,
     name?: string,
   ): Promise<Key<T>> {
-    const chainInfos = Container.get(chainInfoToken);
-
     const addresses: Record<string, string> = {};
     const pubKeys: Record<string, string> = {};
     for (const chainInfo of chainInfos) {
-      const wallet = chainInfo.coinType === '60' ? EthWallet.generateWalletFromPvtKey(privateKey, {paths: [getHDPath('60', '0')], addressPrefix: chainInfo.addressPrefix}) :  await PvtKeyWallet.generateWallet(privateKey, chainInfo.addressPrefix);
+      const wallet =
+        chainInfo.coinType === '60'
+          ? EthWallet.generateWalletFromPvtKey(privateKey, {
+              paths: [getHDPath('60', '0')],
+              addressPrefix: chainInfo.addressPrefix,
+            })
+          : await PvtKeyWallet.generateWallet(privateKey, chainInfo.addressPrefix);
       const [account] = await wallet.getAccounts();
       if (account) {
         addresses[chainInfo.key] = account.address;
@@ -219,7 +184,7 @@ export class KeyChain {
     return wallet[walletId]!;
   }
 
-  static async EditWallet<T extends string>({
+  public static async EditWallet<T extends string>({
     walletId,
     name,
     colorIndex,
@@ -249,34 +214,30 @@ export class KeyChain {
     await KeyChain.updateKeyChain(wallets);
   }
 
-  private static async updateKeyChain<T extends string>(newWallets: Record<string, Key<T>>) {
-    const storage = Container.get(storageToken);
-
-    const keystore: Keystore<T>[] = await storage.get(KEYCHAIN);
-    const newKeystore = { ...keystore, ...newWallets };
-    const entries = Object.keys(newWallets);
-    const lastEntry = entries.pop() ?? '';
-    await storage.set(KEYCHAIN, newKeystore);
-    await storage.set(ACTIVE_WALLET, newWallets[lastEntry]);
-  }
-
-  static async getWalletsFromMnemonic(
+  public static async getWalletsFromMnemonic(
     mnemonic: string,
     count: number,
     coinType: string,
     addressPrefix: string,
-  ): Promise<{ address: string; index: number }[]> {
+  ): Promise<{ address: string; index: number; pubkey: Uint8Array | null }[]> {
     const correctedMnemonic = correctMnemonic(mnemonic);
     const holder = new Array(count).fill(0);
     const hdPaths = holder.map((_, v) => getHDPath(coinType, v.toString()));
 
     const generatedWallet = await generateWalletsFromMnemonic(correctedMnemonic, hdPaths, addressPrefix);
-    const accounts = generatedWallet.getAccounts().map((account, index) => ({ address: account.address, index }));
+    const accounts = generatedWallet
+      .getAccounts()
+      .map((account, index) => ({ address: account.address, pubkey: account.pubkey, index }));
 
     return accounts.sort((a, b) => a.index - b.index);
   }
 
-  static async getSigner<T extends string>(
+  public static async getAllWallets<T extends string>() {
+    const storage = Container.get(storageToken);
+    return (await storage.get(KEYCHAIN)) as unknown as Keystore<T>;
+  }
+
+  public static async getSigner<T extends string>(
     walletId: string,
     password: string,
     addressPrefix: string,
@@ -304,5 +265,48 @@ export class KeyChain {
       const hdPath = getHDPath(coinType, walletData.addressIndex.toString());
       return generateWalletFromMnemonic(secret, hdPath, addressPrefix);
     }
+  }
+
+  private static async getAddresses(
+    mnemonic: string,
+    addressIndex: number,
+    chainInfos: { coinType: string; addressPrefix: string; key: string }[],
+  ) {
+    try {
+      const chainsData = chainInfos;
+      const addresses: Record<string, string> = {};
+      const pubKeys: Record<string, string> = {};
+      for (const chainInfo of chainsData) {
+        const wallet = await generateWalletFromMnemonic(
+          mnemonic,
+          getHDPath(chainInfo.coinType, addressIndex.toString()),
+          chainInfo.addressPrefix,
+        );
+
+        const [account] = await wallet.getAccounts();
+        if (account?.address && account?.pubkey) {
+          addresses[chainInfo.key] = account.address;
+          pubKeys[chainInfo.key] = compressPubicKey(account.pubkey);
+        }
+      }
+      return { addresses, pubKeys };
+    } catch (e) {
+      throw new Error((e as Error).message);
+    }
+  }
+
+  private static isWalletAlreadyPresent<T extends string>(address: string, wallets: Key<T>[]) {
+    return wallets.find((wallet) => Object.values(wallet.addresses).includes(address)) !== undefined;
+  }
+
+  private static async updateKeyChain<T extends string>(newWallets: Record<string, Key<T>>) {
+    const storage = Container.get(storageToken);
+
+    const keystore: Keystore<T>[] = await storage.get(KEYCHAIN);
+    const newKeystore = { ...keystore, ...newWallets };
+    const entries = Object.keys(newWallets);
+    const lastEntry = entries.pop() ?? '';
+    await storage.set(KEYCHAIN, newKeystore);
+    await storage.set(ACTIVE_WALLET, newWallets[lastEntry]);
   }
 }
