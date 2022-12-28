@@ -5,7 +5,7 @@ import * as secp256k1 from 'secp256k1';
 import * as base64js from 'base64-js';
 import { Container } from 'typedi';
 import { decrypt, encrypt } from '../encryption-utils/encryption-utils';
-import { storageToken } from '../storage/storagelayer';
+import { storageToken } from '../storage/storage-layer';
 import { v4 as uuidv4 } from 'uuid';
 import { correctMnemonic } from '../utils/correct-mnemonic';
 import { ChainInfo, CreateWalletParams, Key, Keystore, WALLETTYPE } from '../types/keychain';

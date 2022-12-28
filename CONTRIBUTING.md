@@ -76,10 +76,7 @@ Commands will exit with an error code if unresolved issues remain.
 
 ## Style Guide
 
-- The convention in the TypeScript ecosystem to be to use _kebab-case_ for anything that isn't a TypeScript file except
-  for `.d.ts` files, and _PascalCase_ and _camelCase_ for `.ts` files depending on the type of `export`s that they have
-  but this is difficult to follow, and frankly quite stupid considering how many random baseless rules there are.
-  Therefore, just name all files and directories using _kebab-case_.
+- Name all files and directories using _kebab-case_.
 - Prefer `type`s over `interface`s in TypeScript as `interface`s are verbose, may accidentally be extended if
   another `interface` has the same name, and are meant to either be implemented in `class`es or implicitly extended by
   users of a library .
@@ -92,10 +89,3 @@ Commands will exit with an error code if unresolved issues remain.
 
 Never use dynamic version ranges for dependencies because packages often break in newer versions. For example,
 when `yarn add`ing a dependency, remove the caret from the version number it saved to `package.json`.
-
-## Releasing a New Version
-
-1. Create a PR with your changes.
-2. Bump the version in [`package.json`](package.json).
-3. Add a [Changelog](CHANGELOG.md) entry.
-4. Merge your PR into the `main` branch. The CI/CD pipeline will take care of the rest.

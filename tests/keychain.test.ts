@@ -1,6 +1,6 @@
 import { KeyChain, WALLETTYPE } from '../src';
 import { mnemonic, chainInfos, privateKey, referenceWallets } from './mockdata';
-import { initStorage } from '../src/storage/storagelayer';
+import { initStorage } from '../src/storage/storage-layer';
 
 const { ref1, ref2 } = referenceWallets;
 
