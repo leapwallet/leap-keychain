@@ -10,4 +10,4 @@ export * from './types/keychain';
 export * from './keychain/keychain';
 export * from './utils/get-hdpath';
 export * from './encryption-utils/encryption-utils';
-export { initStorage } from './storage/storagelayer';
+export { initStorage } from './storage/storage-layer';
