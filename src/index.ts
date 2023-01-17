@@ -11,3 +11,8 @@ export * from './keychain/keychain';
 export * from './utils/get-hdpath';
 export * from './encryption-utils/encryption-utils';
 export { initStorage } from './storage/storage-layer';
+export * from './crypto/bip39/bip39-token';
+export * from './crypto/bip32/hdwallet-token';
+export * from './crypto/ecc/secp256k1';
+export * from './crypto/hashes/hashes';
+export * from './utils/init-crypto';

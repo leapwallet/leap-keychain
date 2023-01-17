@@ -1,6 +1,15 @@
 import { KeyChain, WALLETTYPE } from '../src';
 import { mnemonic, chainInfos, privateKey, referenceWallets } from './mockdata';
 import { initStorage } from '../src/storage/storage-layer';
+import { setBip39 } from '../src/crypto/bip39/bip39-token';
+import { Bip39 } from '../src/crypto/bip39/bip39';
+import Container from 'typedi';
+import { bip32Token } from '../src/crypto/bip32/hdwallet-token';
+import { ripemd160Token, sha256Token } from '../src/crypto/hashes/hashes';
+import { Bip32 } from '../src/crypto/bip32/hd-wallet';
+import { sha256 } from '@noble/hashes/sha256';
+import { ripemd160 } from '@noble/hashes/ripemd160';
+import { Secp256k1, secp256k1Token } from '../src/crypto/ecc/secp256k1';
 
 const { ref1, ref2 } = referenceWallets;
 
@@ -35,6 +44,12 @@ function clearStorage() {
 
 beforeEach(() => {
   setStorage();
+
+  setBip39(Bip39);
+  Container.set(bip32Token, Bip32);
+  Container.set(sha256Token, sha256);
+  Container.set(ripemd160Token, ripemd160);
+  Container.set(secp256k1Token, Secp256k1);
 }, 0);
 
 afterEach(() => {

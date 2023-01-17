@@ -1,37 +1,34 @@
-import * as bip39 from 'bip39';
-import { HDKey } from '@scure/bip32';
 import { bech32 } from 'bech32';
 import { serializeSignDoc, serializeStdSignDoc } from '../utils/serialize-signdoc';
 import { StdSignDoc } from '../types/tx';
 import { encodeSecp256k1Signature } from '../utils/encode-signature';
 import { WalletOptions } from '../types/wallet';
-import * as secp256k1 from '@noble/secp256k1';
 import { SignDoc } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
-import { ripemd160 } from '@noble/hashes/ripemd160';
-import { sha256 } from '@noble/hashes/sha256';
+import { getBip39 } from '../crypto/bip39/bip39-token';
+import { getBip32, IHDKey } from '../crypto/bip32/hdwallet-token';
+import Container from 'typedi';
+import { ripemd160Token, sha256Token } from '../crypto/hashes/hashes';
+import { secp256k1Token } from '../crypto/ecc/secp256k1';
 
 export function pubkeyToAddress(prefix: string, publicKey: Uint8Array) {
+  const ripemd160 = Container.get(ripemd160Token);
+  const sha256 = Container.get(sha256Token);
   return bech32.encode(prefix, bech32.toWords(ripemd160(sha256(publicKey))));
 }
 
+export function generateWallet(mnemonic: string, options: WalletOptions) {
+  const bip39 = getBip39();
+  const bip32 = getBip32();
+  if (mnemonic === '') {
+    mnemonic = bip39.generateMnemonic(256 /* 24 words */);
+  }
+  const seed = bip39.mnemonicToSeedSync(mnemonic);
+  const node = bip32.fromSeed(seed);
+  return new Wallet(node, options);
+}
+
 export class Wallet {
-  constructor(private wallet: HDKey, private options: WalletOptions) {}
-
-  static generateWallet(mnemonic: string, options: WalletOptions) {
-    if (mnemonic === '') {
-      mnemonic = bip39.generateMnemonic(256 /* 24 words */);
-    }
-
-    const seed = bip39.mnemonicToSeedSync(mnemonic);
-
-    const node = HDKey.fromMasterSeed(seed);
-    return new Wallet(node, options);
-  }
-
-  static generateWalletFromPrivKey(privKey: string, options: WalletOptions) {
-    const node = HDKey.fromExtendedKey(privKey);
-    return new Wallet(node, options);
-  }
+  constructor(private wallet: IHDKey, private options: WalletOptions) {}
 
   public async signAmino(signerAddress: string, signDoc: StdSignDoc) {
     const accounts = this.getAccountsWithPrivKey();
@@ -42,7 +39,7 @@ export class Wallet {
     if (!account.pubkey) {
       throw new Error('Unable to derive keypair');
     }
-
+    const sha256 = Container.get(sha256Token);
     const hash = sha256(serializeStdSignDoc(signDoc));
     const signature = account.childKey.sign(hash);
 
@@ -61,13 +58,10 @@ export class Wallet {
     if (!account.pubkey || !account.childKey.privateKey) {
       throw new Error('Unable to derive keypair');
     }
-
+    const sha256 = Container.get(sha256Token);
     const hash = sha256(serializeSignDoc(signDoc));
-
-    const signature = await secp256k1.sign(hash, account.childKey.privateKey, {
-      extraEntropy: true,
-      der: false,
-    });
+    const secp256k1 = Container.get(secp256k1Token);
+    const signature = await secp256k1.sign(hash, account.childKey.privateKey);
 
     return {
       signed: signDoc,
@@ -109,7 +103,7 @@ export class PvtKeyWallet {
   static generateWallet(privateKey: string, addressPrefix: string) {
     const sanitizedPvtKey = privateKey.replace('0x', '');
     const pvtKeyBytes = Buffer.from(sanitizedPvtKey, 'hex');
-
+    const secp256k1 = Container.get(secp256k1Token);
     const publicKey = secp256k1.getPublicKey(pvtKeyBytes, true);
     const address = pubkeyToAddress(addressPrefix, publicKey!);
     return new PvtKeyWallet(pvtKeyBytes, publicKey, address);
@@ -134,11 +128,11 @@ export class PvtKeyWallet {
     if (!account.pubkey) {
       throw new Error('Unable to derive keypair');
     }
-
+    const sha256 = Container.get(sha256Token);
     const hash = sha256(serializeStdSignDoc(signDoc));
+    const secp256k1 = Container.get(secp256k1Token);
     const signature = await secp256k1.sign(hash, this.privateKey, {
-      extraEntropy: true,
-      der: false,
+      canonical: true,
     });
 
     return {
@@ -153,13 +147,10 @@ export class PvtKeyWallet {
     if (!account) {
       throw new Error('Signer address does not match wallet address');
     }
-
+    const sha256 = Container.get(sha256Token);
     const hash = sha256(serializeSignDoc(signDoc));
-
-    const signature = await secp256k1.sign(hash, this.privateKey, {
-      extraEntropy: true,
-      der: false,
-    });
+    const secp256k1 = Container.get(secp256k1Token);
+    const signature = await secp256k1.sign(hash, this.privateKey);
 
     return {
       signed: signDoc,

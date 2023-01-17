@@ -1,7 +1,7 @@
 import { EthWallet } from '../key/eth-wallet';
 import getHDPath from '../utils/get-hdpath';
-import { PvtKeyWallet, Wallet } from '../key/wallet';
-import * as secp256k1 from 'secp256k1';
+import { generateWallet, PvtKeyWallet, Wallet } from '../key/wallet';
+
 import * as base64js from 'base64-js';
 import { Container } from 'typedi';
 import { decrypt, encrypt } from '../encryption-utils/encryption-utils';
@@ -9,6 +9,7 @@ import { storageToken } from '../storage/storage-layer';
 import { v4 as uuidv4 } from 'uuid';
 import { correctMnemonic } from '../utils/correct-mnemonic';
 import { ChainInfo, CreateWalletParams, Key, Keystore, WALLETTYPE } from '../types/keychain';
+import { secp256k1Token } from '../crypto/ecc/secp256k1';
 
 const KEYCHAIN = 'keystore';
 const ACTIVE_WALLET = 'active-wallet';
@@ -20,7 +21,7 @@ function generateWalletFromMnemonic(mnemonic: string, hdPath: string, addressPre
   if (coinType?.replace("'", '') === '60') {
     return EthWallet.generateWalletFromMnemonic(mnemonic, { paths: [hdPath], addressPrefix });
   }
-  return Wallet.generateWallet(mnemonic, { paths: [hdPath], addressPrefix });
+  return generateWallet(mnemonic, { paths: [hdPath], addressPrefix });
 }
 
 //TODO: move to wallet utils
@@ -36,11 +37,12 @@ export async function generateWalletsFromMnemonic(mnemonic: string, paths: strin
     throw new Error('All paths must have the same coin type');
   }
 
-  return new Promise((resolve) => resolve(Wallet.generateWallet(mnemonic, { paths, addressPrefix: prefix })));
+  return new Promise((resolve) => resolve(generateWallet(mnemonic, { paths, addressPrefix: prefix })));
 }
 
 //TODO: move to utils
 function compressPubicKey(publicKey: Uint8Array) {
+  const secp256k1 = Container.get(secp256k1Token);
   return base64js.fromByteArray(secp256k1.publicKeyConvert(publicKey, true));
 }
 
@@ -265,6 +267,15 @@ export class KeyChain {
       const hdPath = getHDPath(coinType, walletData.addressIndex.toString());
       return generateWalletFromMnemonic(secret, hdPath, addressPrefix);
     }
+  }
+
+  public static async removeWallets<T extends string>(keyIds: string[]) {
+    const storage = Container.get(storageToken);
+    const keychain = (await storage.get(KEYCHAIN)) as unknown as Keystore<T>;
+    keyIds.forEach((keyId) => {
+      delete keychain[keyId];
+    });
+    storage.set(KEYCHAIN, keychain);
   }
 
   private static async getAddresses(
