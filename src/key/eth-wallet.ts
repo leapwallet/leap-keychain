@@ -9,6 +9,8 @@ import { StdSignDoc } from '../types/tx';
 import { sha256 } from '@noble/hashes/sha256';
 import { serializeStdSignDoc } from '../utils/serialize-signdoc';
 import { encodeSecp256k1Signature } from '../utils/encode-signature';
+import { HDNode } from '@ethersproject/hdnode';
+import { getBip39 } from '../crypto/bip39/bip39-token';
 
 export class EthWallet {
   protected constructor(
@@ -38,12 +40,15 @@ export class EthWallet {
   }
 
   private getAccountsWithPrivKey() {
+    const bip39 = getBip39();
+    const seed = bip39.mnemonicToSeedSync(this.mnemonic);
     return this.options.paths.map((path) => {
-      const ethWallet =
-        this.walletType === 'mnemonic' ? Wallet.fromMnemonic(this.mnemonic, path) : new Wallet(this.pvtKey);
-      const address = ethWallet.address.toString();
-      const addressBuffer = EthereumUtilsAddress.fromString(address).toBuffer();
-      const bech32Address = bech32.encode(this.options.addressPrefix, bech32.toWords(addressBuffer));
+      const hdWallet =
+        this.walletType === 'mnemonic' ? HDNode.fromSeed(seed).derivePath(path) : new Wallet(this.pvtKey);
+
+      const ethAddr = EthereumUtilsAddress.fromString(hdWallet.address).toBuffer();
+      const bech32Address = bech32.encode(this.options.addressPrefix, bech32.toWords(ethAddr));
+      const ethWallet = new Wallet(hdWallet.privateKey);
       return {
         algo: 'ethsecp256k1',
         address: bech32Address,
@@ -59,7 +64,7 @@ export class EthWallet {
     return bytes.arrayify(bytes.concat([splitSignature.r, splitSignature.s]));
   }
 
-  async sign(signerAddress: string, signBytes: string) {
+  async sign(signerAddress: string, signBytes: string | Uint8Array) {
     const accounts = await this.getAccountsWithPrivKey();
     const account = accounts.find(({ address }) => address === signerAddress);
     if (account === undefined) {
