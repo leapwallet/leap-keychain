@@ -1,0 +1,12 @@
+{
+  "entryPoints": ["./src/index.ts"],
+  "out": "docs",
+  "excludeExternals": true,
+  "exclude": "**/*+(.test|.spec|.e2e).ts",
+  "theme": "default",
+  "name": "Leap Keychain",
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "hideGenerator": true,
+  "treatWarningsAsErrors": true
+}

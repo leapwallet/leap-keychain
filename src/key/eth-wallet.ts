@@ -20,10 +20,21 @@ export class EthWallet {
     private options: WalletOptions,
   ) {}
 
+  /**
+   * Generates a wallet from a mnemonic. Returns an EthWallet object.
+   * @param mnemonic The mnemonic to generate a wallet from
+   * @param options WalletOptions object
+   */
   static generateWalletFromMnemonic(mnemonic: string, options: WalletOptions) {
     return new EthWallet(mnemonic, '', 'mnemonic', options);
   }
 
+  /**
+   * Generates a wallet from a private key.
+   * @param {string} pvtKey - The private key to generate the wallet from.
+   * @param {WalletOptions} options - The options for the wallet.
+   * @returns {EthWallet} A wallet object.
+   */
   static generateWalletFromPvtKey(pvtKey: string, options: WalletOptions) {
     return new EthWallet('', pvtKey.replace('0x', ''), 'pvtKey', options);
   }
