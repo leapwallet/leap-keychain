@@ -63,4 +63,6 @@ To use the keychain
   
 ```
 
+## [Security](SECURITY.md)
+
 ## [Contributing](CONTRIBUTING.md)
