@@ -6,7 +6,6 @@ import { keccak256 } from 'ethereumjs-util';
 import * as bytes from '@ethersproject/bytes';
 import { fromHex } from '../utils/encoding';
 import { StdSignDoc } from '../types/tx';
-import { sha256 } from '@noble/hashes/sha256';
 import { serializeSignDoc, serializeStdSignDoc } from '../utils/serialize-signdoc';
 import { encodeSecp256k1Signature } from '../utils/encode-signature';
 import { HDNode } from '@ethersproject/hdnode';
@@ -70,12 +69,6 @@ export class EthWallet {
     });
   }
 
-  private static signMessage(wallet: Wallet, hash: Uint8Array) {
-    const signature = wallet._signingKey().signDigest(keccak256(Buffer.from(hash)));
-    const splitSignature = bytes.splitSignature(signature);
-    return bytes.arrayify(bytes.concat([splitSignature.r, splitSignature.s]));
-  }
-
   sign(signerAddress: string, signBytes: string | Uint8Array) {
     const accounts = this.getAccountsWithPrivKey();
     const account = accounts.find(({ address }) => address === signerAddress);
@@ -94,8 +87,8 @@ export class EthWallet {
     if (!account) {
       throw new Error('Signer address does not match wallet address');
     }
-    const hash = sha256(serializeStdSignDoc(signDoc));
-    const signature = EthWallet.signMessage(account.ethWallet, hash);
+    const hash = serializeStdSignDoc(signDoc);
+    const signature = this.sign(signerAddress, keccak256(Buffer.from(hash)));
     return {
       signed: signDoc,
       signature: encodeSecp256k1Signature(account.pubkey, signature),
