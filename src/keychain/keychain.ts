@@ -158,7 +158,7 @@ export class KeyChain {
   }) {
     const storage = Container.get(storageToken);
 
-    const keyStore = storage.get(KEYCHAIN) as unknown as Keystore<T>;
+    const keyStore = (await storage.get(KEYCHAIN)) as unknown as Keystore<T>;
     const wallet = keyStore[walletId];
     if (!wallet) {
       throw new Error('Wallet not found');
