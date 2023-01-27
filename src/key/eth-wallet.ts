@@ -6,11 +6,11 @@ import { keccak256 } from 'ethereumjs-util';
 import * as bytes from '@ethersproject/bytes';
 import { fromHex } from '../utils/encoding';
 import { StdSignDoc } from '../types/tx';
-import { sha256 } from '@noble/hashes/sha256';
-import { serializeStdSignDoc } from '../utils/serialize-signdoc';
+import { serializeSignDoc, serializeStdSignDoc } from '../utils/serialize-signdoc';
 import { encodeSecp256k1Signature } from '../utils/encode-signature';
 import { HDNode } from '@ethersproject/hdnode';
 import { getBip39 } from '../crypto/bip39/bip39-token';
+import { SignDoc } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
 
 export class EthWallet {
   protected constructor(
@@ -69,20 +69,14 @@ export class EthWallet {
     });
   }
 
-  private static signMessage(wallet: Wallet, hash: Uint8Array) {
-    const signature = wallet._signingKey().signDigest(keccak256(Buffer.from(hash)));
-    const splitSignature = bytes.splitSignature(signature);
-    return bytes.arrayify(bytes.concat([splitSignature.r, splitSignature.s]));
-  }
-
-  async sign(signerAddress: string, signBytes: string | Uint8Array) {
-    const accounts = await this.getAccountsWithPrivKey();
+  sign(signerAddress: string, signBytes: string | Uint8Array) {
+    const accounts = this.getAccountsWithPrivKey();
     const account = accounts.find(({ address }) => address === signerAddress);
     if (account === undefined) {
       throw new Error(`Address ${signerAddress} not found in wallet`);
     }
     const { ethWallet } = account;
-    const signature = await ethWallet._signingKey().signDigest(signBytes);
+    const signature = ethWallet._signingKey().signDigest(signBytes);
     const splitSignature = bytes.splitSignature(signature);
     return bytes.arrayify(bytes.concat([splitSignature.r, splitSignature.s]));
   }
@@ -93,23 +87,24 @@ export class EthWallet {
     if (!account) {
       throw new Error('Signer address does not match wallet address');
     }
-    const hash = sha256(serializeStdSignDoc(signDoc));
-    const signature = EthWallet.signMessage(account.ethWallet, hash);
+    const hash = serializeStdSignDoc(signDoc);
+    const signature = this.sign(signerAddress, keccak256(Buffer.from(hash)));
     return {
       signed: signDoc,
       signature: encodeSecp256k1Signature(account.pubkey, signature),
     };
   }
 
-  public signDirect(signerAddress: string, signDoc: StdSignDoc) {
+  public async signDirect(signerAddress: string, signDoc: SignDoc) {
     const accounts = this.getAccountsWithPrivKey();
-    const account = accounts.find((account) => account.address === signerAddress);
-    if (!account) {
-      throw new Error('Signer address does not match wallet address');
+    const account = accounts.find(({ address }) => address === signerAddress);
+    if (account === undefined) {
+      throw new Error(`Address ${signerAddress} not found in wallet`);
     }
 
-    const hash = sha256(serializeStdSignDoc(signDoc));
-    const signature = EthWallet.signMessage(account.ethWallet, hash);
+    const hash = serializeSignDoc(signDoc);
+
+    const signature = this.sign(signerAddress, keccak256(Buffer.from(hash)));
     return {
       signed: signDoc,
       signature: encodeSecp256k1Signature(account.pubkey, signature),
