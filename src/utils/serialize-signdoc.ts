@@ -24,7 +24,6 @@ export function serializeStdSignDoc(signDoc: StdSignDoc) {
 }
 
 export function serializeSignDoc(signDoc: SignDoc) {
-  console.log('logging account number and chain id', signDoc.accountNumber, signDoc.chainId);
   return SignDoc.encode(
     SignDoc.fromPartial({
       accountNumber: signDoc.accountNumber,
