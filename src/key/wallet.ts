@@ -61,7 +61,7 @@ export class Wallet {
     const sha256 = Container.get(sha256Token);
     const hash = sha256(serializeSignDoc(signDoc));
     const secp256k1 = Container.get(secp256k1Token);
-    const signature = await secp256k1.sign(hash, account.childKey.privateKey);
+    const signature = await secp256k1.sign(hash, account.childKey.privateKey, { canonical: true });
 
     return {
       signed: signDoc,
