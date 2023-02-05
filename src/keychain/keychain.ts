@@ -10,8 +10,10 @@ import { correctMnemonic } from '../utils/correct-mnemonic';
 import { ChainInfo, CreateWalletParams, Key, Keystore, WALLETTYPE } from '../types/keychain';
 import { compressedPublicKey, generateWalletFromMnemonic, generateWalletsFromMnemonic } from '../key/wallet-utils';
 
-const KEYCHAIN = 'keystore';
-const ACTIVE_WALLET = 'active-wallet';
+export const KEYCHAIN = 'keystore';
+export const ENCRYPTED_KEYCHAIN = 'encrypted-keystore';
+export const ACTIVE_WALLET = 'active-wallet';
+export const ENCRYPTED_ACTIVE_WALLET = 'encrypted-active-wallet';
 
 export class KeyChain {
   public static async createWalletUsingMnemonic<T extends string>({
@@ -237,6 +239,37 @@ export class KeyChain {
       delete keychain[keyId];
     });
     storage.set(KEYCHAIN, keychain);
+  }
+
+  public static async encrypt<T extends string>(password: string) {
+    const storage = Container.get(storageToken);
+    const keychain = (await storage.get(KEYCHAIN)) as unknown as Keystore<T>;
+    const activeWallet = (await storage.get(ACTIVE_WALLET)) as unknown as Key<T>;
+    const keychainJSON = JSON.stringify(keychain);
+    const activeWalletJSON = JSON.stringify(activeWallet);
+
+    const encryptedKeychain = encrypt(keychainJSON, password);
+    const encryptedActiveWallet = encrypt(activeWalletJSON, password);
+
+    storage.set(ENCRYPTED_KEYCHAIN, encryptedKeychain);
+    storage.set(ENCRYPTED_ACTIVE_WALLET, encryptedActiveWallet);
+
+    storage.remove(KEYCHAIN);
+    storage.remove(ACTIVE_WALLET);
+  }
+
+  public static async decrypt(password: string) {
+    const storage = Container.get(storageToken);
+    const encryptedKeychain = (await storage.get(ENCRYPTED_KEYCHAIN)) as unknown as string;
+    const encryptedActiveWallet = (await storage.get(ENCRYPTED_ACTIVE_WALLET)) as unknown as string;
+    if (encryptedKeychain) {
+      const keychain = JSON.parse(decrypt(encryptedKeychain, password));
+      storage.set(KEYCHAIN, keychain);
+    }
+    if (encryptedActiveWallet) {
+      const activeWallet = JSON.parse(decrypt(encryptedActiveWallet, password));
+      storage.set(ACTIVE_WALLET, activeWallet);
+    }
   }
 
   private static async getAddresses(
