@@ -7,9 +7,19 @@ Key management library
 - Programming languages: ES6 (JavaScript, TypeScript, etc. which target ES6 or higher)
 - Static types: TypeScript definitions bundled
 
+
 ## Installation
 
-1. You can install the package using: `yarn add @leapwallet/leap-keychain`
+Use one of the following methods:
+
+- npm:
+  ```shell
+  npm i @leapwallet/leap-keychain
+  ```
+- Yarn:
+  ```shell
+  yarn add @leapwallet/leap-keychain
+  ```
 
 ## Usage
 
