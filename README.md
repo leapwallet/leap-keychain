@@ -7,7 +7,6 @@ leap-keychain library includes modules for key management, account creation, and
 - Programming languages: ES6 (JavaScript, TypeScript, etc. which target ES6 or higher)
 - Static types: TypeScript definitions bundled
 
-
 ## Installation
 
 Use one of the following methods:
