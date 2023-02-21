@@ -1,6 +1,6 @@
 # Leap Keychain
 
-Key management library
+leap-keychain library includes modules for key management, account creation, and transaction signing for cosmos blockchains.
 
 - Platforms: Browsers supporting ES6 or higher
 - Module systems: ECMAScript Modules
