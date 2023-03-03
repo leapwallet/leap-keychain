@@ -65,6 +65,7 @@ describe('keychain', () => {
       addressIndex: 0,
       colorIndex: 0,
       chainInfos: chainInfoslist,
+      type: 'create',
     });
 
     const key = storageObj['keystore'][_key.id];
@@ -94,6 +95,7 @@ describe('keychain', () => {
       addressIndex: 0,
       colorIndex: 0,
       chainInfos: chainInfoslist,
+      type: 'create',
     });
 
     const _key = await KeyChain.createNewWalletAccount('testwallet', 'password', 1, chainInfoslist);

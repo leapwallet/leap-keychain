@@ -23,6 +23,7 @@ export class KeyChain {
     addressIndex,
     colorIndex,
     chainInfos,
+    type,
   }: CreateWalletParams): Promise<Key<T>> {
     const allWallets = (await KeyChain.getAllWallets()) ?? {};
     const walletsData = Object.values(allWallets);
@@ -40,7 +41,7 @@ export class KeyChain {
       cipher: encrypt(mnemonic, password),
       addresses,
       pubKeys,
-      walletType: WALLETTYPE.SEED_PHRASE,
+      walletType: type === 'create' ? WALLETTYPE.SEED_PHRASE : WALLETTYPE.SEED_PHRASE_IMPORTED,
       id: walletId,
       colorIndex: colorIndex,
     };

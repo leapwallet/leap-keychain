@@ -25,6 +25,7 @@ export type CreateWalletParams = {
   addressIndex: number;
   colorIndex: number;
   chainInfos: ChainInfo[];
+  type: 'create' | 'import';
 };
 
 export type ChainInfo = {
