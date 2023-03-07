@@ -75,7 +75,7 @@ jobs:
           scope: '@leapwallet'
       - run: yarn
       - run: yarn build
-      - run: yarn publish:ci
+      - run: yarn publish --non-interactive
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   github-release:
