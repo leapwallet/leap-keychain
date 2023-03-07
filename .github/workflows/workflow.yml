@@ -47,7 +47,7 @@ jobs:
           build_dir: docs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  publish-lib:
+  publish-npm-registry:
     if: github.ref == 'refs/heads/main'
     needs: [lint, test]
     runs-on: ubuntu-latest
@@ -62,6 +62,23 @@ jobs:
       - run: yarn publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  publish-github-registry:
+    if: github.ref == 'refs/heads/main'
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - run: yarn
+      - run: yarn build
+      - run: |
+          echo @leapwallet:https://npm.pkg.github.com/ > .npmrc
+          echo '//npm.pkg.github.com/:_authToken=${PUBLISH_TOKEN}' >> .npmrc
+      - run: yarn publish
+        env:
+          PUBLISH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   github-release:
     if: github.ref == 'refs/heads/main'
     needs: host-docs
