@@ -75,10 +75,10 @@ jobs:
       - run: yarn build
       - run: |
           echo @leapwallet:https://npm.pkg.github.com/ > .npmrc
-          echo '//npm.pkg.github.com/:_authToken=${PUBLISH_TOKEN}' >> .npmrc
+          echo '//npm.pkg.github.com/:_authToken=${NPM_TOKEN}' >> .npmrc
       - run: yarn publish
         env:
-          PUBLISH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   github-release:
     if: github.ref == 'refs/heads/main'
     needs: host-docs
