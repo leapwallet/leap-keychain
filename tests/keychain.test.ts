@@ -105,4 +105,23 @@ describe('keychain', () => {
     expect(key.addressIndex).toEqual(1);
     expect(key.pubKeys).toEqual(ref2.pubKeys);
   });
+
+  test('calling keychain multiple times should not override the keychain', async () => {
+    const key = await KeyChain.createWalletUsingMnemonic({
+      name: 'testwallet',
+      mnemonic: mnemonic,
+      password: 'password',
+      addressIndex: 0,
+      colorIndex: 0,
+      chainInfos: chainInfoslist,
+      type: 'create',
+    });
+
+    await KeyChain.encrypt('password');
+    await KeyChain.encrypt('password');
+
+    await KeyChain.decrypt('password');
+
+    expect(storageObj['keystore'][key.id].addresses).toEqual(ref1.addresses);
+  });
 });

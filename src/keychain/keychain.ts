@@ -246,17 +246,19 @@ export class KeyChain {
     const storage = Container.get(storageToken);
     const keychain = (await storage.get(KEYCHAIN)) as unknown as Keystore<T>;
     const activeWallet = (await storage.get(ACTIVE_WALLET)) as unknown as Key<T>;
-    const keychainJSON = JSON.stringify(keychain);
-    const activeWalletJSON = JSON.stringify(activeWallet);
+    if (keychain && activeWallet) {
+      const keychainJSON = JSON.stringify(keychain);
+      const activeWalletJSON = JSON.stringify(activeWallet);
 
-    const encryptedKeychain = encrypt(keychainJSON, password);
-    const encryptedActiveWallet = encrypt(activeWalletJSON, password);
+      const encryptedKeychain = encrypt(keychainJSON, password);
+      const encryptedActiveWallet = encrypt(activeWalletJSON, password);
 
-    storage.set(ENCRYPTED_KEYCHAIN, encryptedKeychain);
-    storage.set(ENCRYPTED_ACTIVE_WALLET, encryptedActiveWallet);
+      storage.set(ENCRYPTED_KEYCHAIN, encryptedKeychain);
+      storage.set(ENCRYPTED_ACTIVE_WALLET, encryptedActiveWallet);
 
-    storage.remove(KEYCHAIN);
-    storage.remove(ACTIVE_WALLET);
+      storage.remove(KEYCHAIN);
+      storage.remove(ACTIVE_WALLET);
+    }
   }
 
   public static async decrypt(password: string) {
