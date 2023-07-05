@@ -69,16 +69,34 @@ export class EthWallet {
     });
   }
 
-  sign(signerAddress: string, signBytes: string | Uint8Array) {
+  public sign(signerAddress: string, signBytes: string | Uint8Array) {
     const accounts = this.getAccountsWithPrivKey();
     const account = accounts.find(({ address }) => address === signerAddress);
     if (account === undefined) {
       throw new Error(`Address ${signerAddress} not found in wallet`);
     }
     const { ethWallet } = account;
-    const signature = ethWallet._signingKey().signDigest(signBytes);
-    const splitSignature = bytes.splitSignature(signature);
-    return bytes.arrayify(bytes.concat([splitSignature.r, splitSignature.s]));
+    return ethWallet._signingKey().signDigest(signBytes);
+  }
+
+  signMessage(signerAddress: string, message: Uint8Array) {
+    const accounts = this.getAccountsWithPrivKey();
+    const account = accounts.find(({ address }) => address === signerAddress);
+    if (account === undefined) {
+      throw new Error(`Address ${signerAddress} not found in wallet`);
+    }
+    const { ethWallet } = account;
+    return ethWallet.signMessage(message);
+  }
+
+  async signTransaction(signerAddress: string, transaction: any) {
+    const accounts = this.getAccountsWithPrivKey();
+    const account = accounts.find(({ address }) => address === signerAddress);
+    if (account === undefined) {
+      throw new Error(`Address ${signerAddress} not found in wallet`);
+    }
+    const { ethWallet } = account;
+    return ethWallet.signTransaction(transaction);
   }
 
   public signAmino(signerAddress: string, signDoc: StdSignDoc) {
@@ -88,7 +106,9 @@ export class EthWallet {
       throw new Error('Signer address does not match wallet address');
     }
     const hash = serializeStdSignDoc(signDoc);
-    const signature = this.sign(signerAddress, keccak256(Buffer.from(hash)));
+    const rawSignature = this.sign(signerAddress, keccak256(Buffer.from(hash)));
+    const splitSignature = bytes.splitSignature(rawSignature);
+    const signature = bytes.arrayify(bytes.concat([splitSignature.r, splitSignature.s]));
     return {
       signed: signDoc,
       signature: encodeSecp256k1Signature(account.pubkey, signature),
@@ -104,7 +124,9 @@ export class EthWallet {
 
     const hash = serializeSignDoc(signDoc);
 
-    const signature = this.sign(signerAddress, keccak256(Buffer.from(hash)));
+    const rawSignature = this.sign(signerAddress, keccak256(Buffer.from(hash)));
+    const splitSignature = bytes.splitSignature(rawSignature);
+    const signature = bytes.arrayify(bytes.concat([splitSignature.r, splitSignature.s]));
     return {
       signed: signDoc,
       signature: encodeSecp256k1Signature(account.pubkey, signature),
