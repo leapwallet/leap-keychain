@@ -30,18 +30,22 @@ export function generateWallet(mnemonic: string, options: WalletOptions) {
 export class Wallet {
   constructor(private wallet: IHDKey, private options: WalletOptions) {}
 
-  public async signAmino(signerAddress: string, signDoc: StdSignDoc) {
+  public async signAmino(signerAddress: string, signDoc: StdSignDoc, signOptions?: { extraEntropy: boolean }) {
     const accounts = this.getAccountsWithPrivKey();
     const account = accounts.find((account) => account.address === signerAddress);
     if (!account) {
       throw new Error('Signer address does not match wallet address');
     }
-    if (!account.pubkey) {
+    if (!account.pubkey || !account.childKey.privateKey) {
       throw new Error('Unable to derive keypair');
     }
     const sha256 = Container.get(sha256Token);
     const hash = sha256(serializeStdSignDoc(signDoc));
-    const signature = account.childKey.sign(hash);
+    const secp256k1 = Container.get(secp256k1Token);
+    const signature = await secp256k1.sign(hash, account.childKey.privateKey, {
+      canonical: true,
+      extraEntropy: signOptions?.extraEntropy === false ? undefined : true,
+    });
 
     return {
       signed: signDoc,
@@ -49,7 +53,7 @@ export class Wallet {
     };
   }
 
-  async signDirect(signerAddress: string, signDoc: SignDoc) {
+  async signDirect(signerAddress: string, signDoc: SignDoc, signOptions?: { extraEntropy?: boolean }) {
     const accounts = this.getAccountsWithPrivKey();
     const account = accounts.find((account) => account.address === signerAddress);
     if (!account) {
@@ -61,7 +65,10 @@ export class Wallet {
     const sha256 = Container.get(sha256Token);
     const hash = sha256(serializeSignDoc(signDoc));
     const secp256k1 = Container.get(secp256k1Token);
-    const signature = await secp256k1.sign(hash, account.childKey.privateKey, { canonical: true });
+    const signature = await secp256k1.sign(hash, account.childKey.privateKey, {
+      canonical: true,
+      extraEntropy: signOptions?.extraEntropy === false ? undefined : true,
+    });
 
     return {
       signed: signDoc,
@@ -119,7 +126,7 @@ export class PvtKeyWallet {
     ];
   }
 
-  public async signAmino(signerAddress: string, signDoc: StdSignDoc) {
+  public async signAmino(signerAddress: string, signDoc: StdSignDoc, signOptions?: { extraEntropy?: boolean }) {
     const accounts = this.getAccounts();
     const account = accounts.find((account) => account.address === signerAddress);
     if (!account) {
@@ -133,6 +140,7 @@ export class PvtKeyWallet {
     const secp256k1 = Container.get(secp256k1Token);
     const signature = await secp256k1.sign(hash, this.privateKey, {
       canonical: true,
+      extraEntropy: signOptions?.extraEntropy === false ? undefined : true,
     });
 
     return {
@@ -141,7 +149,7 @@ export class PvtKeyWallet {
     };
   }
 
-  async signDirect(signerAddress: string, signDoc: SignDoc) {
+  async signDirect(signerAddress: string, signDoc: SignDoc, signOptions?: { extraEntropy?: boolean }) {
     const accounts = this.getAccounts();
     const account = accounts.find((account) => account.address === signerAddress);
     if (!account) {
@@ -150,7 +158,10 @@ export class PvtKeyWallet {
     const sha256 = Container.get(sha256Token);
     const hash = sha256(serializeSignDoc(signDoc));
     const secp256k1 = Container.get(secp256k1Token);
-    const signature = await secp256k1.sign(hash, this.privateKey, { canonical: true });
+    const signature = await secp256k1.sign(hash, this.privateKey, {
+      canonical: true,
+      extraEntropy: signOptions?.extraEntropy === false ? undefined : true,
+    });
 
     return {
       signed: signDoc,
