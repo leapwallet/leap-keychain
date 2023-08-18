@@ -8,11 +8,11 @@ export namespace Secp256k1 {
   export function sign(
     message: Uint8Array,
     privateKey: Uint8Array,
-    options?: { canonical: boolean },
+    options?: { canonical: boolean; extraEntropy?: true },
   ): Promise<Uint8Array> {
     return _Secp256k1.sign(message, privateKey, {
       canonical: options?.canonical,
-      extraEntropy: true,
+      extraEntropy: options?.extraEntropy,
       der: false,
     });
   }
