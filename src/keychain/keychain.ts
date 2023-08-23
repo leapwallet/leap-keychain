@@ -285,13 +285,13 @@ export class KeyChain {
       const addresses: Record<string, string> = {};
       const pubKeys: Record<string, string> = {};
       for (const chainInfo of chainsData) {
-        const wallet = await generateWalletFromMnemonic(
+        const wallet = generateWalletFromMnemonic(
           mnemonic,
           getHDPath(chainInfo.coinType, addressIndex.toString()),
           chainInfo.addressPrefix,
         );
 
-        const [account] = await wallet.getAccounts();
+        const [account] = wallet.getAccounts();
         if (account?.address && account?.pubkey) {
           addresses[chainInfo.key] = account.address;
           pubKeys[chainInfo.key] = compressedPublicKey(account.pubkey);
@@ -309,7 +309,6 @@ export class KeyChain {
 
   private static async updateKeyChain<T extends string>(newWallets: Record<string, Key<T>>) {
     const storage = Container.get(storageToken);
-
     const keystore: Keystore<T>[] = await storage.get(KEYCHAIN);
     const newKeystore = { ...keystore, ...newWallets };
     const entries = Object.keys(newWallets);
