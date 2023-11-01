@@ -5,6 +5,7 @@ export interface IBip39 {
   mnemonicToSeed(mnemonic: string): Promise<Uint8Array>;
   validateMnemonic(mnemonic: string): boolean;
   mnemonicToSeedSync(mnemonic: string): Uint8Array;
+  mnemonicToEntropy(mnemonic: string): string;
 }
 
 export const bip39Token = new Token<IBip39>('bip39');

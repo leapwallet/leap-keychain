@@ -1,19 +1,24 @@
 import Container from 'typedi';
 import { secp256k1Token } from '../crypto/ecc/secp256k1';
 import { EthWallet } from './eth-wallet';
-import { generateWallet, Wallet } from './wallet';
+import { Wallet } from './wallet';
 import * as base64js from 'base64-js';
+import { bip39Token } from '../crypto/bip39/bip39-token';
 
 export function generateWalletFromMnemonic(mnemonic: string, hdPath: string, addressPrefix: string) {
+  const bip39 = Container.get(bip39Token);
+  bip39.mnemonicToEntropy(mnemonic);
   const hdPathParams = hdPath.split('/');
   const coinType = hdPathParams[2];
   if (coinType?.replace("'", '') === '60') {
     return EthWallet.generateWalletFromMnemonic(mnemonic, { paths: [hdPath], addressPrefix });
   }
-  return generateWallet(mnemonic, { paths: [hdPath], addressPrefix });
+  return Wallet.generateWallet(mnemonic, { paths: [hdPath], addressPrefix });
 }
 
-export async function generateWalletsFromMnemonic(mnemonic: string, paths: string[], prefix: string): Promise<Wallet> {
+export function generateWalletsFromMnemonic(mnemonic: string, paths: string[], prefix: string): Wallet | EthWallet {
+  const bip39 = Container.get(bip39Token);
+  bip39.mnemonicToEntropy(mnemonic);
   const coinTypes = paths.map((hdPath) => {
     const pathParams = hdPath.split('/');
     return pathParams[2]?.replace("'", '');
@@ -24,8 +29,11 @@ export async function generateWalletsFromMnemonic(mnemonic: string, paths: strin
   if (!isValid) {
     throw new Error('All paths must have the same coin type');
   }
+  if (refCoinType === '60') {
+    return EthWallet.generateWalletFromMnemonic(mnemonic, { paths, addressPrefix: prefix });
+  }
 
-  return new Promise((resolve) => resolve(generateWallet(mnemonic, { paths, addressPrefix: prefix })));
+  return Wallet.generateWallet(mnemonic, { paths, addressPrefix: prefix });
 }
 
 export function compressedPublicKey(publicKey: Uint8Array) {
