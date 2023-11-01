@@ -13,4 +13,7 @@ export namespace Bip39 {
   export function mnemonicToSeedSync(mnemonic: string): Uint8Array {
     return bip39.mnemonicToSeedSync(mnemonic);
   }
+  export function mnemonicToEntropy(mnemonic: string): string {
+    return bip39.mnemonicToEntropy(mnemonic);
+  }
 }

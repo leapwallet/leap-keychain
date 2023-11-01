@@ -9,11 +9,14 @@ import { StdSignDoc } from '../types/tx';
 import { serializeSignDoc, serializeStdSignDoc } from '../utils/serialize-signdoc';
 import { encodeSecp256k1Signature } from '../utils/encode-signature';
 import { HDNode } from '@ethersproject/hdnode';
-import { getBip39 } from '../crypto/bip39/bip39-token';
+import { bip39Token, getBip39 } from '../crypto/bip39/bip39-token';
 import { SignDoc } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
+import Container from 'typedi';
+
+import { sha256Token } from '../crypto/hashes/hashes';
 
 export class EthWallet {
-  protected constructor(
+  private constructor(
     private mnemonic: string,
     private pvtKey: string,
     private walletType: 'mnemonic' | 'pvtKey',
@@ -26,6 +29,8 @@ export class EthWallet {
    * @param options WalletOptions object
    */
   static generateWalletFromMnemonic(mnemonic: string, options: WalletOptions) {
+    const bip39 = Container.get(bip39Token);
+    bip39.mnemonicToEntropy(mnemonic);
     return new EthWallet(mnemonic, '', 'mnemonic', options);
   }
 
@@ -36,6 +41,11 @@ export class EthWallet {
    * @returns {EthWallet} A wallet object.
    */
   static generateWalletFromPvtKey(pvtKey: string, options: WalletOptions) {
+    try {
+      new Wallet(pvtKey);
+    } catch (e) {
+      throw new Error('Invalid private key');
+    }
     return new EthWallet('', pvtKey.replace('0x', ''), 'pvtKey', options);
   }
 
@@ -122,11 +132,13 @@ export class EthWallet {
       throw new Error(`Address ${signerAddress} not found in wallet`);
     }
 
-    const hash = serializeSignDoc(signDoc);
+    const sha256 = Container.get(sha256Token);
+    const hash = sha256(serializeSignDoc(signDoc));
 
     const rawSignature = this.sign(signerAddress, keccak256(Buffer.from(hash)));
     const splitSignature = bytes.splitSignature(rawSignature);
     const signature = bytes.arrayify(bytes.concat([splitSignature.r, splitSignature.s]));
+
     return {
       signed: signDoc,
       signature: encodeSecp256k1Signature(account.pubkey, signature),

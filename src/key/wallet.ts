@@ -16,19 +16,17 @@ export function pubkeyToAddress(prefix: string, publicKey: Uint8Array) {
   return bech32.encode(prefix, bech32.toWords(ripemd160(sha256(publicKey))));
 }
 
-export function generateWallet(mnemonic: string, options: WalletOptions) {
-  const bip39 = getBip39();
-  const bip32 = getBip32();
-  if (mnemonic === '') {
-    mnemonic = bip39.generateMnemonic(256 /* 24 words */);
-  }
-  const seed = bip39.mnemonicToSeedSync(mnemonic);
-  const node = bip32.fromSeed(seed);
-  return new Wallet(node, options);
-}
-
 export class Wallet {
-  constructor(private wallet: IHDKey, private options: WalletOptions) {}
+  private constructor(private wallet: IHDKey, private options: WalletOptions) {}
+
+  static generateWallet(mnemonic: string, options: WalletOptions) {
+    const bip39 = getBip39();
+    const bip32 = getBip32();
+    bip39.mnemonicToEntropy(mnemonic);
+    const seed = bip39.mnemonicToSeedSync(mnemonic);
+    const node = bip32.fromSeed(seed);
+    return new Wallet(node, options);
+  }
 
   public async signAmino(signerAddress: string, signDoc: StdSignDoc, signOptions?: { extraEntropy: boolean }) {
     const accounts = this.getAccountsWithPrivKey();
@@ -108,12 +106,16 @@ export class PvtKeyWallet {
   constructor(private privateKey: Uint8Array, private publicKey: Uint8Array, private address: string) {}
 
   static generateWallet(privateKey: string, addressPrefix: string) {
-    const sanitizedPvtKey = privateKey.replace('0x', '');
-    const pvtKeyBytes = Buffer.from(sanitizedPvtKey, 'hex');
-    const secp256k1 = Container.get(secp256k1Token);
-    const publicKey = secp256k1.getPublicKey(pvtKeyBytes, true);
-    const address = pubkeyToAddress(addressPrefix, publicKey!);
-    return new PvtKeyWallet(pvtKeyBytes, publicKey, address);
+    try {
+      const sanitizedPvtKey = privateKey.replace('0x', '');
+      const pvtKeyBytes = Buffer.from(sanitizedPvtKey, 'hex');
+      const secp256k1 = Container.get(secp256k1Token);
+      const publicKey = secp256k1.getPublicKey(pvtKeyBytes, true);
+      const address = pubkeyToAddress(addressPrefix, publicKey!);
+      return new PvtKeyWallet(pvtKeyBytes, publicKey, address);
+    } catch {
+      throw new Error('Invalid private key');
+    }
   }
 
   getAccounts() {
