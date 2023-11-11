@@ -13,8 +13,6 @@ import { bip39Token, getBip39 } from '../crypto/bip39/bip39-token';
 import { SignDoc } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
 import Container from 'typedi';
 
-import { sha256Token } from '../crypto/hashes/hashes';
-
 export class EthWallet {
   private constructor(
     private mnemonic: string,
@@ -132,8 +130,7 @@ export class EthWallet {
       throw new Error(`Address ${signerAddress} not found in wallet`);
     }
 
-    const sha256 = Container.get(sha256Token);
-    const hash = sha256(serializeSignDoc(signDoc));
+    const hash = serializeSignDoc(signDoc);
 
     const rawSignature = this.sign(signerAddress, keccak256(Buffer.from(hash)));
     const splitSignature = bytes.splitSignature(rawSignature);
