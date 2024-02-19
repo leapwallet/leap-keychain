@@ -1,0 +1,59 @@
+on:
+  push:
+    branches: [staging]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 16
+      - run: yarn
+      - run: yarn lint:check
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 16
+      - run: yarn
+      - run: yarn test:coverage
+
+      - name: Comment Test Coverage
+        uses: raulanatol/jest-coverage-comment-action@main
+        with:
+          github-token: ${{ secrets.NODE_AUTH_TOKEN }}
+          use-existing-reports: true
+  publish-npm-registry:
+    if: github.ref == 'refs/heads/staging'
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          registry-url: 'https://registry.npmjs.org'
+      - run: yarn
+      - run: yarn build
+      - run: yarn publish --tag beta
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  publish-github-registry:
+    if: github.ref == 'refs/heads/staging'
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@leapwallet'
+      - run: yarn
+      - run: yarn build
+      - run: yarn publish --tag beta --non-interactive
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
