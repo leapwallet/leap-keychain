@@ -76,11 +76,22 @@ describe('generateMnemonic', () => {
     const accounts = wallet.getAccounts();
     expect(accounts[0]?.address).toBe(referenceWallets.ref2.addresses.cosmos);
   });
+  test('generateWalletFromMnemonic for cointype=60', () => {
+    const wallet = generateWalletFromMnemonic(mnemonic, "m/44'/60'/0'/0/1", 'evmos');
+    const accounts = wallet.getAccounts();
+    expect(accounts[0]?.address).toBe(referenceWallets.ref2.addresses.evmos);
+  });
   test('generateWalletsFromMnemonic', async () => {
     const wallet = generateWalletsFromMnemonic(mnemonic, ["m/44'/118'/0'/0/0", "m/44'/118'/0'/0/1"], 'cosmos');
     const accounts = wallet.getAccounts();
     expect(accounts[0]?.address).toBe(referenceWallets.ref1.addresses.cosmos);
     expect(accounts[1]?.address).toBe(referenceWallets.ref2.addresses.cosmos);
+  });
+  test('generateWalletsFromMnemonic for cointype=60', async () => {
+    const wallet = generateWalletsFromMnemonic(mnemonic, ["m/44'/60'/0'/0/0", "m/44'/60'/0'/0/1"], 'evmos');
+    const accounts = wallet.getAccounts();
+    expect(accounts[0]?.address).toBe(referenceWallets.ref1.addresses.evmos);
+    expect(accounts[1]?.address).toBe(referenceWallets.ref2.addresses.evmos);
   });
   test('generateWalletFromMnemonic throws error if mnemonic is invalid', () => {
     expect(() => generateWalletFromMnemonic('', "m/44'/118'/0'/0/0", 'cosmos')).toThrow('Invalid mnemonic');

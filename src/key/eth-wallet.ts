@@ -11,6 +11,7 @@ import { encodeSecp256k1Signature } from '../utils/encode-signature';
 import { HDNode } from '@ethersproject/hdnode';
 import { bip39Token, getBip39 } from '../crypto/bip39/bip39-token';
 import { SignDoc } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
+import { TransactionRequest, Provider } from '@ethersproject/abstract-provider';
 import Container from 'typedi';
 
 export class EthWallet {
@@ -19,6 +20,7 @@ export class EthWallet {
     private pvtKey: string,
     private walletType: 'mnemonic' | 'pvtKey',
     private options: WalletOptions,
+    private provider?: Provider,
   ) {}
 
   /**
@@ -30,6 +32,10 @@ export class EthWallet {
     const bip39 = Container.get(bip39Token);
     bip39.mnemonicToEntropy(mnemonic);
     return new EthWallet(mnemonic, '', 'mnemonic', options);
+  }
+
+  setProvider(provider: Provider) {
+    this.provider = provider;
   }
 
   /**
@@ -67,7 +73,7 @@ export class EthWallet {
 
       const ethAddr = EthereumUtilsAddress.fromString(hdWallet.address).toBuffer();
       const bech32Address = bech32.encode(this.options.addressPrefix, bech32.toWords(ethAddr));
-      const ethWallet = new Wallet(hdWallet.privateKey);
+      const ethWallet = new Wallet(hdWallet.privateKey, this.provider);
       return {
         algo: 'ethsecp256k1',
         address: bech32Address,
@@ -87,6 +93,17 @@ export class EthWallet {
     return ethWallet._signingKey().signDigest(signBytes);
   }
 
+  public async sendTransaction(transaction: TransactionRequest) {
+    const accounts = this.getAccountsWithPrivKey();
+    const account = accounts[0];
+    if (!account) throw new Error('Account not found');
+    // if (account === undefined) {
+    //   throw new Error(`Address ${signerAddress} not found in wallet`);
+    // }
+    const { ethWallet } = account;
+    return await ethWallet.sendTransaction(transaction);
+  }
+
   signMessage(signerAddress: string, message: Uint8Array) {
     const accounts = this.getAccountsWithPrivKey();
     const account = accounts.find(({ address }) => address === signerAddress);
@@ -104,6 +121,7 @@ export class EthWallet {
       throw new Error(`Address ${signerAddress} not found in wallet`);
     }
     const { ethWallet } = account;
+
     return ethWallet.signTransaction(transaction);
   }
 
@@ -117,6 +135,7 @@ export class EthWallet {
     const rawSignature = this.sign(signerAddress, keccak256(Buffer.from(hash)));
     const splitSignature = bytes.splitSignature(rawSignature);
     const signature = bytes.arrayify(bytes.concat([splitSignature.r, splitSignature.s]));
+
     return {
       signed: signDoc,
       signature: encodeSecp256k1Signature(account.pubkey, signature),

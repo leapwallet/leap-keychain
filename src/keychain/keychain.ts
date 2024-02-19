@@ -208,6 +208,7 @@ export class KeyChain {
     password: string,
     addressPrefix: string,
     coinType: string,
+    ethWallet?: boolean,
   ) {
     const storage = Container.get(storageToken);
     const keychain = (await storage.get(KEYCHAIN)) as unknown as Keystore<T>;
@@ -222,14 +223,14 @@ export class KeyChain {
       throw new Error('Wallet type not supported');
     }
     if (walletData.walletType === WALLETTYPE.PRIVATE_KEY) {
-      if (coinType === '60') {
+      if (coinType === '60' || ethWallet) {
         const hdPath = getHDPath(coinType, walletData.addressIndex.toString());
         return EthWallet.generateWalletFromPvtKey(secret, { paths: [hdPath], addressPrefix });
       }
       return PvtKeyWallet.generateWallet(secret, addressPrefix);
     } else {
       const hdPath = getHDPath(coinType, walletData.addressIndex.toString());
-      return generateWalletFromMnemonic(secret, hdPath, addressPrefix);
+      return generateWalletFromMnemonic(secret, hdPath, addressPrefix, ethWallet);
     }
   }
 

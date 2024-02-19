@@ -5,12 +5,17 @@ import { Wallet } from './wallet';
 import * as base64js from 'base64-js';
 import { bip39Token } from '../crypto/bip39/bip39-token';
 
-export function generateWalletFromMnemonic(mnemonic: string, hdPath: string, addressPrefix: string) {
+export function generateWalletFromMnemonic(
+  mnemonic: string,
+  hdPath: string,
+  addressPrefix: string,
+  ethWallet?: boolean,
+) {
   const bip39 = Container.get(bip39Token);
   bip39.mnemonicToEntropy(mnemonic);
   const hdPathParams = hdPath.split('/');
   const coinType = hdPathParams[2];
-  if (coinType?.replace("'", '') === '60') {
+  if (coinType?.replace("'", '') === '60' || ethWallet) {
     return EthWallet.generateWalletFromMnemonic(mnemonic, { paths: [hdPath], addressPrefix });
   }
   return Wallet.generateWallet(mnemonic, { paths: [hdPath], addressPrefix });

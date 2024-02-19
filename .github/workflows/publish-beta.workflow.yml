@@ -2,6 +2,7 @@ on:
   push:
     branches: [staging]
 jobs:
+jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
