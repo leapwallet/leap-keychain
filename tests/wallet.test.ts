@@ -72,12 +72,20 @@ describe('generateMnemonic', () => {
     ).toThrow('Invalid private key');
   });
   test('generateWalletFromMnemonic', () => {
-    const wallet = generateWalletFromMnemonic(mnemonic, "m/44'/118'/0'/0/1", 'cosmos');
+    const wallet = generateWalletFromMnemonic(mnemonic, {
+      hdPath: "m/44'/118'/0'/0/1",
+      addressPrefix: 'cosmos',
+      ethWallet: false,
+    });
     const accounts = wallet.getAccounts();
     expect(accounts[0]?.address).toBe(referenceWallets.ref2.addresses.cosmos);
   });
   test('generateWalletFromMnemonic for cointype=60', () => {
-    const wallet = generateWalletFromMnemonic(mnemonic, "m/44'/60'/0'/0/1", 'evmos');
+    const wallet = generateWalletFromMnemonic(mnemonic, {
+      hdPath: "m/44'/60'/0'/0/1",
+      addressPrefix: 'evmos',
+      ethWallet: false,
+    });
     const accounts = wallet.getAccounts();
     expect(accounts[0]?.address).toBe(referenceWallets.ref2.addresses.evmos);
   });
@@ -94,7 +102,9 @@ describe('generateMnemonic', () => {
     expect(accounts[1]?.address).toBe(referenceWallets.ref2.addresses.evmos);
   });
   test('generateWalletFromMnemonic throws error if mnemonic is invalid', () => {
-    expect(() => generateWalletFromMnemonic('', "m/44'/118'/0'/0/0", 'cosmos')).toThrow('Invalid mnemonic');
+    expect(() =>
+      generateWalletFromMnemonic('', { hdPath: "m/44'/118'/0'/0/0", addressPrefix: 'cosmos', ethWallet: false }),
+    ).toThrow('Invalid mnemonic');
   });
   test('generateWalletsFromMnemonic throws error if mnemonic is invalid', () => {
     expect(() => generateWalletsFromMnemonic('', ["m/44'/118'/0'/0/0"], 'cosmos')).toThrow('Invalid mnemonic');

@@ -206,9 +206,17 @@ export class KeyChain {
   public static async getSigner<T extends string>(
     walletId: string,
     password: string,
-    addressPrefix: string,
-    coinType: string,
-    ethWallet?: boolean,
+    {
+      addressPrefix,
+      coinType,
+      ethWallet,
+      pubKeyBech32Address,
+    }: {
+      addressPrefix: string;
+      coinType: string;
+      ethWallet?: boolean;
+      pubKeyBech32Address?: boolean;
+    },
   ) {
     const storage = Container.get(storageToken);
     const keychain = (await storage.get(KEYCHAIN)) as unknown as Keystore<T>;
@@ -225,12 +233,12 @@ export class KeyChain {
     if (walletData.walletType === WALLETTYPE.PRIVATE_KEY) {
       if (coinType === '60' || ethWallet) {
         const hdPath = getHDPath(coinType, walletData.addressIndex.toString());
-        return EthWallet.generateWalletFromPvtKey(secret, { paths: [hdPath], addressPrefix });
+        return EthWallet.generateWalletFromPvtKey(secret, { paths: [hdPath], addressPrefix, pubKeyBech32Address });
       }
       return PvtKeyWallet.generateWallet(secret, addressPrefix);
     } else {
       const hdPath = getHDPath(coinType, walletData.addressIndex.toString());
-      return generateWalletFromMnemonic(secret, hdPath, addressPrefix, ethWallet);
+      return generateWalletFromMnemonic(secret, { hdPath, addressPrefix, ethWallet: !!ethWallet, pubKeyBech32Address });
     }
   }
 
@@ -286,11 +294,11 @@ export class KeyChain {
       const addresses: Record<string, string> = {};
       const pubKeys: Record<string, string> = {};
       for (const chainInfo of chainsData) {
-        const wallet = generateWalletFromMnemonic(
-          mnemonic,
-          getHDPath(chainInfo.coinType, addressIndex.toString()),
-          chainInfo.addressPrefix,
-        );
+        const wallet = generateWalletFromMnemonic(mnemonic, {
+          hdPath: getHDPath(chainInfo.coinType, addressIndex.toString()),
+          addressPrefix: chainInfo.addressPrefix,
+          ethWallet: false,
+        });
 
         const [account] = wallet.getAccounts();
         if (account?.address && account?.pubkey) {
