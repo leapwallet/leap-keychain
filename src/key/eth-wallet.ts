@@ -13,6 +13,7 @@ import { bip39Token, getBip39 } from '../crypto/bip39/bip39-token';
 import { SignDoc } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
 import { TransactionRequest, Provider } from '@ethersproject/abstract-provider';
 import Container from 'typedi';
+import { pubkeyToAddress } from './wallet';
 
 export class EthWallet {
   private constructor(
@@ -72,13 +73,18 @@ export class EthWallet {
         this.walletType === 'mnemonic' ? HDNode.fromSeed(seed).derivePath(path) : new Wallet(this.pvtKey);
 
       const ethAddr = EthereumUtilsAddress.fromString(hdWallet.address).toBuffer();
-      const bech32Address = bech32.encode(this.options.addressPrefix, bech32.toWords(ethAddr));
+
       const ethWallet = new Wallet(hdWallet.privateKey, this.provider);
+      const pubkey = fromHex(ethWallet._signingKey().compressedPublicKey.replace('0x', ''));
+
+      const bech32Address = this.options.pubKeyBech32Address
+        ? pubkeyToAddress(this.options.addressPrefix, pubkey)
+        : bech32.encode(this.options.addressPrefix, bech32.toWords(ethAddr));
       return {
         algo: 'ethsecp256k1',
         address: bech32Address,
         ethWallet: ethWallet,
-        pubkey: fromHex(ethWallet._signingKey().compressedPublicKey.replace('0x', '')),
+        pubkey,
       };
     });
   }
