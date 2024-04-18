@@ -1,6 +1,6 @@
 {
   "name": "@leapwallet/leap-keychain",
-  "version": "0.2.4-beta.1",
+  "version": "0.2.4-beta.2",
   "description": "A javascript library for crypto key management",
   "scripts": {
     "test": "jest",
@@ -42,7 +42,8 @@
   "bugs": "https://github.com/leapwallet/leap-keychain/issues",
   "homepage": "https://github.com/leapwallet/leap-keychain#readme",
   "files": [
-    "dist/src/"
+    "dist/browser/src/",
+    "dist/node/src/"
   ],
   "main": "dist/node/src/index.js",
   "browser": "dist/browser/src/index.js",
