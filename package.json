@@ -1,6 +1,6 @@
 {
   "name": "@leapwallet/leap-keychain",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "A javascript library for crypto key management",
   "scripts": {
     "test": "jest",
@@ -18,7 +18,7 @@
     "doc:build": "yarn doc",
     "doc:watch": "yarn doc --watch",
     "prepublish": "yarn build",
-    "build": "tsc",
+    "build": "tsc -p tsconfig-browser.json && tsc -p tsconfig-node.json",
     "test:coverage": "jest --coverage"
   },
   "jest": {
@@ -29,7 +29,7 @@
       "/dist/"
     ]
   },
-  "types": "dist/src/index.d.ts",
+  "types": "dist/browser/src/index.d.ts",
   "license": "MIT",
   "repository": "leapwallet/leap-keychain",
   "keywords": [
@@ -41,11 +41,12 @@
   "author": "Leap Wallet <admin@leapwallet.io> (https://leapwallet.io)",
   "bugs": "https://github.com/leapwallet/leap-keychain/issues",
   "homepage": "https://github.com/leapwallet/leap-keychain#readme",
-  "main": "dist/src/index.js",
   "files": [
-    "dist/src/"
+    "dist/browser/src/",
+    "dist/node/src/"
   ],
-  "browser": "dist/src/index.js",
+  "main": "dist/node/src/index.js",
+  "browser": "dist/browser/src/index.js",
   "dependencies": {
     "@ethersproject/bytes": "5.7.0",
     "@ethersproject/hdnode": "5.7.0",
