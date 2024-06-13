@@ -1,6 +1,6 @@
 {
   "name": "@leapwallet/leap-keychain",
-  "version": "0.2.4-beta.2",
+  "version": "0.2.5-beta.0",
   "description": "A javascript library for crypto key management",
   "scripts": {
     "test": "jest",
@@ -51,15 +51,16 @@
     "@ethersproject/bytes": "5.7.0",
     "@ethersproject/hdnode": "5.7.0",
     "@ethersproject/wallet": "5.7.0",
+    "@noble/ciphers": "0.5.3",
     "@noble/hashes": "1.1.5",
     "@noble/secp256k1": "1.7.0",
+    "@scure/base": "1.1.6",
     "@scure/bip32": "1.1.1",
     "base64-js": "1.5.1",
     "bech32": "2.0.0",
     "bip32": "2.0.6",
     "bip39": "3.0.4",
     "cosmjs-types": "0.6.1",
-    "crypto-js": "4.1.1",
     "ethereumjs-util": "7.1.5",
     "typedi": "0.10.0",
     "uuid": "9.0.0"
