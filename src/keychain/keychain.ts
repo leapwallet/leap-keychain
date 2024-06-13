@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { correctMnemonic } from '../utils/correct-mnemonic';
 import { ChainInfo, CreateWalletParams, Key, Keystore, WALLETTYPE } from '../types/keychain';
 import { compressedPublicKey, generateWalletFromMnemonic, generateWalletsFromMnemonic } from '../key/wallet-utils';
+import { convertAddress } from '../utils/bech32-address-converter';
 
 export const KEYCHAIN = 'keystore';
 export const ENCRYPTED_KEYCHAIN = 'encrypted-keystore';
@@ -293,7 +294,15 @@ export class KeyChain {
       const chainsData = chainInfos;
       const addresses: Record<string, string> = {};
       const pubKeys: Record<string, string> = {};
+      const coinTypeKeys: Record<string, { address: string; pubkey: string }> = {};
+
       for (const chainInfo of chainsData) {
+        const coinTypeKey = coinTypeKeys[chainInfo.coinType];
+        if (coinTypeKey) {
+          addresses[chainInfo.key] = convertAddress(coinTypeKey.address, chainInfo.addressPrefix);
+          pubKeys[chainInfo.key] = coinTypeKey.pubkey;
+          continue;
+        }
         const wallet = generateWalletFromMnemonic(mnemonic, {
           hdPath: getHDPath(chainInfo.coinType, addressIndex.toString()),
           addressPrefix: chainInfo.addressPrefix,
@@ -302,6 +311,7 @@ export class KeyChain {
 
         const [account] = wallet.getAccounts();
         if (account?.address && account?.pubkey) {
+          coinTypeKeys[chainInfo.coinType] = { address: account.address, pubkey: compressedPublicKey(account.pubkey) };
           addresses[chainInfo.key] = account.address;
           pubKeys[chainInfo.key] = compressedPublicKey(account.pubkey);
         }
