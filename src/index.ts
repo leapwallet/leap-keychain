@@ -16,3 +16,5 @@ export * from './crypto/bip32/hdwallet-token';
 export * from './crypto/ecc/secp256k1';
 export * from './crypto/hashes/hashes';
 export * from './utils/init-crypto';
+export * from './key/wallet-utils';
+export * from './utils/get-hdpath'
