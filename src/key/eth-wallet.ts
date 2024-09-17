@@ -22,7 +22,7 @@ export class EthWallet {
     private walletType: 'mnemonic' | 'pvtKey',
     private options: WalletOptions,
     private provider?: Provider,
-  ) {}
+  ) { }
 
   /**
    * Generates a wallet from a mnemonic. Returns an EthWallet object.
@@ -127,7 +127,6 @@ export class EthWallet {
       throw new Error(`Address ${signerAddress} not found in wallet`);
     }
     const { ethWallet } = account;
-
     return ethWallet.signTransaction(transaction);
   }
 

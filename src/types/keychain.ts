@@ -21,7 +21,7 @@ export type Keystore<T extends string> = Record<string, Key<T>>;
 export type CreateWalletParams = {
   name: string;
   mnemonic: string;
-  password: string;
+  password: string | Uint8Array;
   addressIndex: number;
   colorIndex: number;
   chainInfos: ChainInfo[];
