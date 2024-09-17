@@ -10,6 +10,7 @@ import { correctMnemonic } from '../utils/correct-mnemonic';
 import { ChainInfo, CreateWalletParams, Key, Keystore, WALLETTYPE } from '../types/keychain';
 import { compressedPublicKey, generateWalletFromMnemonic, generateWalletsFromMnemonic } from '../key/wallet-utils';
 import { convertAddress } from '../utils/bech32-address-converter';
+import { Input } from '@noble/ciphers/utils';
 
 export const KEYCHAIN = 'keystore';
 export const ENCRYPTED_KEYCHAIN = 'encrypted-keystore';
@@ -56,7 +57,7 @@ export class KeyChain {
 
   public static async createNewWalletAccount<T extends string>(
     name: string,
-    password: string,
+    password: Input,
     colorIndex: number,
     chainInfos: ChainInfo[],
   ): Promise<Key<T>> {
@@ -101,7 +102,7 @@ export class KeyChain {
 
   public static async importNewWallet<T extends string>(
     privateKey: string,
-    password: string,
+    password: Input,
     chainInfos: ChainInfo[],
     addressIndex?: number,
     name?: string,
@@ -112,9 +113,9 @@ export class KeyChain {
       const wallet =
         chainInfo.coinType === '60'
           ? EthWallet.generateWalletFromPvtKey(privateKey, {
-              paths: [getHDPath('60', '0')],
-              addressPrefix: chainInfo.addressPrefix,
-            })
+            paths: [getHDPath('60', '0')],
+            addressPrefix: chainInfo.addressPrefix,
+          })
           : await PvtKeyWallet.generateWallet(privateKey, chainInfo.addressPrefix);
       const [account] = await wallet.getAccounts();
       if (account) {
@@ -206,7 +207,7 @@ export class KeyChain {
 
   public static async getSigner<T extends string>(
     walletId: string,
-    password: string,
+    password: Input,
     {
       addressPrefix,
       coinType,
@@ -252,7 +253,7 @@ export class KeyChain {
     storage.set(KEYCHAIN, keychain);
   }
 
-  public static async encrypt<T extends string>(password: string) {
+  public static async encrypt<T extends string>(password: Input) {
     const storage = Container.get(storageToken);
     const keychain = (await storage.get(KEYCHAIN)) as unknown as Keystore<T>;
     const activeWallet = (await storage.get(ACTIVE_WALLET)) as unknown as Key<T>;
@@ -271,7 +272,7 @@ export class KeyChain {
     }
   }
 
-  public static async decrypt(password: string) {
+  public static async decrypt(password: Input) {
     const storage = Container.get(storageToken);
     const encryptedKeychain = (await storage.get(ENCRYPTED_KEYCHAIN)) as unknown as string;
     const encryptedActiveWallet = (await storage.get(ENCRYPTED_ACTIVE_WALLET)) as unknown as string;

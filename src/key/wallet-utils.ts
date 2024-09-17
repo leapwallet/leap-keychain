@@ -5,6 +5,17 @@ import { Wallet } from './wallet';
 import * as base64js from 'base64-js';
 import { bip39Token } from '../crypto/bip39/bip39-token';
 
+
+/***
+ * Generate a wallet from a mnemonic
+ * @param mnemonic
+ * @param options {
+ *  hdPath: string,
+ *  addressPrefix: string,
+ *  ethWallet: boolean, - if true, it generates an ethereum wallet regardless of cointype
+ *  pubKeyBech32Address: boolean - if true, it generates a bech32 address from public key instead of ethereum address.
+ * }
+ */
 export function generateWalletFromMnemonic(
   mnemonic: string,
   {
