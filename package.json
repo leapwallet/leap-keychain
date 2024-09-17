@@ -1,6 +1,6 @@
 {
   "name": "@leapwallet/leap-keychain",
-  "version": "0.2.5-beta.3",
+  "version": "0.2.5-beta.4",
   "description": "A javascript library for crypto key management",
   "scripts": {
     "test": "jest",
