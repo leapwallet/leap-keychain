@@ -113,9 +113,9 @@ export class KeyChain {
       const wallet =
         chainInfo.coinType === '60'
           ? EthWallet.generateWalletFromPvtKey(privateKey, {
-            paths: [getHDPath('60', '0')],
-            addressPrefix: chainInfo.addressPrefix,
-          })
+              paths: [getHDPath('60', '0')],
+              addressPrefix: chainInfo.addressPrefix,
+            })
           : await PvtKeyWallet.generateWallet(privateKey, chainInfo.addressPrefix);
       const [account] = await wallet.getAccounts();
       if (account) {

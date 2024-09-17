@@ -22,7 +22,7 @@ export class EthWallet {
     private walletType: 'mnemonic' | 'pvtKey',
     private options: WalletOptions,
     private provider?: Provider,
-  ) { }
+  ) {}
 
   /**
    * Generates a wallet from a mnemonic. Returns an EthWallet object.

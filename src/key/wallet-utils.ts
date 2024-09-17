@@ -5,7 +5,6 @@ import { Wallet } from './wallet';
 import * as base64js from 'base64-js';
 import { bip39Token } from '../crypto/bip39/bip39-token';
 
-
 /***
  * Generate a wallet from a mnemonic
  * @param mnemonic
