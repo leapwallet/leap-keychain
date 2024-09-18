@@ -1,6 +1,7 @@
 //import CryptoJS from 'crypto-js';
 import { cbc } from '@noble/ciphers/aes';
 import { pbkdf2 } from '@noble/hashes/pbkdf2';
+import { Input } from '@noble/hashes/utils';
 import { randomBytes } from '@noble/ciphers/webcrypto';
 import { sha1 } from '@noble/hashes/sha1';
 import { base64, hex } from '@scure/base';
@@ -45,8 +46,9 @@ const new_iterations = 10_000;
 //   }).toString(CryptoJS.enc.Utf8);
 // };
 
-export const encrypt = (msg: string, pass: string, iterations?: number) => {
+export const encrypt = (msg: string, pass: Input, iterations?: number) => {
   const salt = randomBytes(128 / 8);
+
   const key = pbkdf2(sha1, pass, salt, { c: iterations ?? new_iterations, dkLen: keySize / 8 });
   const iv = randomBytes(128 / 8);
   const stream = cbc(key, iv);
@@ -58,7 +60,7 @@ export const encrypt = (msg: string, pass: string, iterations?: number) => {
   return saltString + ivString + encryptedString;
 };
 
-export const decrypt = (transitmessage: string, pass: string, iterations?: number): string => {
+export const decrypt = (transitmessage: string, pass: Input, iterations?: number): string => {
   const salt = hex.decode(transitmessage.substring(0, 32));
   const iv = hex.decode(transitmessage.substring(32, 64));
   const encrypted = base64.decode(transitmessage.substring(64));

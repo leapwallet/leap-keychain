@@ -127,7 +127,6 @@ export class EthWallet {
       throw new Error(`Address ${signerAddress} not found in wallet`);
     }
     const { ethWallet } = account;
-
     return ethWallet.signTransaction(transaction);
   }
 
