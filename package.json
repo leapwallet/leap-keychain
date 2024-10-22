@@ -34,8 +34,8 @@
   "bugs": "https://github.com/leapwallet/leap-keychain/issues",
   "homepage": "https://github.com/leapwallet/leap-keychain#readme",
   "files": [
-    "dist/browser/src/",
-    "dist/node/src/"
+    "dist/browser/",
+    "dist/node/"
   ],
   "main": "dist/node/index.js",
   "browser": "dist/browser/index.js",
