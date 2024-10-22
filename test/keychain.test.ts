@@ -10,6 +10,7 @@ import { Bip32 } from '../src/crypto/bip32/hd-wallet';
 import { sha256 } from '@noble/hashes/sha256';
 import { ripemd160 } from '@noble/hashes/ripemd160';
 import { Secp256k1, secp256k1Token } from '../src/crypto/ecc/secp256k1';
+import expect from 'expect.js'
 
 const { ref1, ref2 } = referenceWallets;
 
@@ -57,7 +58,7 @@ afterEach(() => {
 }, 0);
 
 describe('keychain', () => {
-  test('createWalletFromMnemonic', async () => {
+  it('createWalletFromMnemonic', async () => {
     const _key = await KeyChain.createWalletUsingMnemonic({
       name: 'testwallet',
       mnemonic: mnemonic,
@@ -70,24 +71,24 @@ describe('keychain', () => {
 
     const key = storageObj['keystore'][_key.id];
 
-    expect(key.addresses).toEqual(ref1.addresses);
-    expect(key.pubKeys).toEqual(ref1.pubKeys);
-    expect(key.name).toEqual(ref1.name);
-    expect(key.addressIndex).toEqual(ref1.addressIndex);
-    expect(key.colorIndex).toEqual(ref1.colorIndex);
-    expect(key.walletType).toEqual(ref1.walletType);
+    expect(key.addresses).to.eql(ref1.addresses);
+    expect(key.pubKeys).to.eql(ref1.pubKeys);
+    expect(key.name).to.eql(ref1.name);
+    expect(key.addressIndex).to.eql(ref1.addressIndex);
+    expect(key.colorIndex).to.eql(ref1.colorIndex);
+    expect(key.walletType).to.eql(ref1.walletType);
   });
 
-  test('createWalletFromPrivateKey', async () => {
+  it('createWalletFromPrivateKey', async () => {
     const _key = await KeyChain.importNewWallet(privateKey, 'password', chainInfoslist, 0, 'privatekeywallet');
     const key = storageObj['keystore'][_key.id];
 
-    expect(key.addresses['cosmos']).toEqual(ref1.addresses.cosmos);
-    expect(key.pubKeys['cosmos']).toEqual(ref1.pubKeys.cosmos);
-    expect(key.walletType).toEqual(WALLETTYPE.PRIVATE_KEY);
+    expect(key.addresses['cosmos']).to.eql(ref1.addresses.cosmos);
+    expect(key.pubKeys['cosmos']).to.eql(ref1.pubKeys.cosmos);
+    expect(key.walletType).to.eql(WALLETTYPE.PRIVATE_KEY);
   });
 
-  test('createWalletFromExistingMnemonic', async () => {
+  it('createWalletFromExistingMnemonic', async () => {
     await KeyChain.createWalletUsingMnemonic({
       name: 'testwallet',
       mnemonic: mnemonic,
@@ -101,12 +102,12 @@ describe('keychain', () => {
     const _key = await KeyChain.createNewWalletAccount('testwallet', 'password', 1, chainInfoslist);
 
     const key = storageObj['keystore'][_key.id];
-    expect(key.addresses).toEqual(ref2.addresses);
-    expect(key.addressIndex).toEqual(1);
-    expect(key.pubKeys).toEqual(ref2.pubKeys);
+    expect(key.addresses).to.eql(ref2.addresses);
+    expect(key.addressIndex).to.eql(1);
+    expect(key.pubKeys).to.eql(ref2.pubKeys);
   });
 
-  test('calling keychain multiple times should not override the keychain', async () => {
+  it('calling keychain multiple times should not override the keychain', async () => {
     const key = await KeyChain.createWalletUsingMnemonic({
       name: 'testwallet',
       mnemonic: mnemonic,
@@ -122,6 +123,6 @@ describe('keychain', () => {
 
     await KeyChain.decrypt('password');
 
-    expect(storageObj['keystore'][key.id].addresses).toEqual(ref1.addresses);
+    expect(storageObj['keystore'][key.id].addresses).to.eql(ref1.addresses);
   });
 });
