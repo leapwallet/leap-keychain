@@ -1,9 +1,9 @@
 {
   "name": "@leapwallet/leap-keychain",
-  "version": "0.2.5-beta.4",
+  "version": "0.2.5-beta.5",
   "description": "A javascript library for crypto key management",
   "scripts": {
-    "test": "jest",
+    "test": "nyc mocha",
     "lint:prettier": "prettier . --ignore-path .gitignore",
     "lint:prettier:check": "yarn lint:prettier -c",
     "lint:prettier:fix": "yarn lint:prettier -w",
@@ -19,7 +19,7 @@
     "doc:watch": "yarn doc --watch",
     "prepublish": "yarn build",
     "build": "tsc -p tsconfig-browser.json && tsc -p tsconfig-node.json",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "nyc"
   },
   "jest": {
     "preset": "ts-jest",
@@ -60,21 +60,25 @@
     "bech32": "2.0.0",
     "bip32": "2.0.6",
     "bip39": "3.0.4",
-    "cosmjs-types": "0.6.1",
+    "cosmjs-types": "0.8.0",
     "ethereumjs-util": "7.1.5",
     "typedi": "0.10.0",
     "uuid": "9.0.0"
   },
   "devDependencies": {
     "@types/crypto-js": "4.1.1",
+    "@types/expect.js": "^0.3.32",
     "@types/jest": "28.1.4",
+    "@types/mocha": "^10.0.9",
     "@types/uuid": "^9.0.0",
     "@typescript-eslint/eslint-plugin": "5.9.1",
     "@typescript-eslint/parser": "5.9.1",
     "eslint": "8.6.0",
-    "jest": "29.7.0",
+    "expect.js": "^0.3.1",
+    "mocha": "^10.7.3",
+    "nyc": "^17.1.0",
     "prettier": "2.5.1",
-    "ts-jest": "28.0.5",
+    "ts-node": "^10.9.2",
     "typedoc": "0.22.17",
     "typedoc-plugin-missing-exports": "1.0.0",
     "typescript": "4.7.3"
@@ -106,5 +110,9 @@
       "@typescript-eslint/no-non-null-assertion": "off",
       "@typescript-eslint/no-namespace": "off"
     }
+  },
+  "resolutions": {
+    "protobufjs": "6.11.4"
+
   }
 }
