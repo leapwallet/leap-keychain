@@ -10,7 +10,7 @@ import { Bip32 } from '../src/crypto/bip32/hd-wallet';
 import { sha256 } from '@noble/hashes/sha256';
 import { ripemd160 } from '@noble/hashes/ripemd160';
 import { Secp256k1, secp256k1Token } from '../src/crypto/ecc/secp256k1';
-import expect from 'expect.js'
+import expect from 'expect.js';
 
 const { ref1, ref2 } = referenceWallets;
 

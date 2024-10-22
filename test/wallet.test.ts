@@ -10,7 +10,7 @@ import { EthWallet } from '../src/key/eth-wallet';
 import { chainInfos, mnemonic, referenceWallets } from './mockdata';
 import { sha256 } from '@noble/hashes/sha256';
 import { ripemd160 } from '@noble/hashes/ripemd160';
-import expect from 'expect.js'
+import expect from 'expect.js';
 
 beforeEach(() => {
   setBip39(Bip39);
@@ -53,29 +53,27 @@ describe('generateMnemonic', () => {
 
   it('Wallet throws error if mnemonic is invalid', () => {
     expect(() => Wallet.generateWallet('', { paths: ["m/44'/60'/0'/0/0"], addressPrefix: 'cosmos' })).throwError((e) =>
-      expect(e.message).equal('Invalid mnemonic')
+      expect(e.message).equal('Invalid mnemonic'),
     );
   });
 
   it('PvtkeyWallet throws error if pvtKey is invalid', () => {
     expect(() => PvtKeyWallet.generateWallet('', 'cosmos')).throwError((e) => {
-      expect(e.message).to.equal('Invalid private key')
+      expect(e.message).to.equal('Invalid private key');
     });
   });
 
   it('Ethwallet throws error if mnemonic is invalid', () => {
     expect(() =>
       EthWallet.generateWalletFromMnemonic('', { paths: ["m/44'/60'/0'/0/0"], addressPrefix: 'cosmos' }),
-    ).throwError((e) =>
-      expect(e.message).equal('Invalid mnemonic')
-    );
+    ).throwError((e) => expect(e.message).equal('Invalid mnemonic'));
   });
 
   it('Ethwallet throws error if pvtKey is invalid', () => {
     expect(() =>
       EthWallet.generateWalletFromPvtKey('', { paths: ["m/44'/118'/0'/0/0"], addressPrefix: 'cosmos' }),
     ).throwError((e) => {
-      expect(e.message).to.equal('Invalid private key')
+      expect(e.message).to.equal('Invalid private key');
     });
   });
   it('generateWalletFromMnemonic', () => {
@@ -114,6 +112,8 @@ describe('generateMnemonic', () => {
     ).throwError((e) => expect(e.message).equal('Invalid mnemonic'));
   });
   it('generateWalletsFromMnemonic throws error if mnemonic is invalid', () => {
-    expect(() => generateWalletsFromMnemonic('', ["m/44'/118'/0'/0/0"], 'cosmos')).throwError((e) => expect(e.message).equal('Invalid mnemonic'));;
+    expect(() => generateWalletsFromMnemonic('', ["m/44'/118'/0'/0/0"], 'cosmos')).throwError((e) =>
+      expect(e.message).equal('Invalid mnemonic'),
+    );
   });
 });
