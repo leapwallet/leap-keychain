@@ -6,4 +6,4 @@ coverage
 **/*.html
 .github
 docs/
-
+dist/
