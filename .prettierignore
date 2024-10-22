@@ -5,4 +5,5 @@ coverage
 # Ignore all HTML files:
 **/*.html
 .github
+docs/
 
