@@ -1,10 +1,10 @@
 {
   "name": "@leapwallet/leap-keychain",
-  "version": "0.2.5-beta.6",
+  "version": "0.2.5-beta.7",
   "description": "A javascript library for crypto key management",
   "scripts": {
     "test": "nyc mocha",
-    "lint:prettier": "prettier . --ignore-path .gitignore",
+    "lint:prettier": "prettier . --ignore-pattern",
     "lint:prettier:check": "yarn lint:prettier -c",
     "lint:prettier:fix": "yarn lint:prettier -w",
     "lint:eslint": "eslint .",
@@ -37,8 +37,8 @@
     "dist/browser/src/",
     "dist/node/src/"
   ],
-  "main": "dist/node/src/index.js",
-  "browser": "dist/browser/src/index.js",
+  "main": "dist/node/index.js",
+  "browser": "dist/browser/index.js",
   "dependencies": {
     "@ethersproject/bytes": "5.7.0",
     "@ethersproject/hdnode": "5.7.0",
