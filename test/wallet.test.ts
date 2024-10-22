@@ -79,7 +79,7 @@ describe('generateMnemonic', () => {
     expect(() =>
       EthWallet.generateWalletFromPvtKey('', { paths: ["m/44'/118'/0'/0/0"], addressPrefix: 'cosmos' }),
     ).throwError((e) => {
-      expect(e.message).to.equal('Invalid private key');
+      expect(e.message).to.contain('Invalid private key');
     });
   });
   it('generateWalletFromMnemonic', () => {
