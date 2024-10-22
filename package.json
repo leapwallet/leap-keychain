@@ -1,6 +1,6 @@
 {
   "name": "@leapwallet/leap-keychain",
-  "version": "0.2.5-beta.7",
+  "version": "0.2.5-beta.8",
   "description": "A javascript library for crypto key management",
   "scripts": {
     "test": "nyc mocha",
@@ -21,7 +21,7 @@
     "build": "tsc -p tsconfig-browser.json && tsc -p tsconfig-node.json",
     "test:coverage": "nyc"
   },
-  "types": "dist/browser/src/index.d.ts",
+  "types": "dist/browser/index.d.ts",
   "license": "MIT",
   "repository": "leapwallet/leap-keychain",
   "keywords": [
