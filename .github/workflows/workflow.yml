@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: 18
       - run: yarn
-      - run: yarn test:coverage
+      - run: yarn test
 
       - name: Comment Test Coverage
         uses: raulanatol/jest-coverage-comment-action@main
