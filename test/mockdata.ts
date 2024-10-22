@@ -101,6 +101,20 @@ export const chainInfos = {
   },
 };
 
+export const ethSignTestData = {
+  input: '19924af5c9d08a0d766b1beedd3a7823df1d76d7c62dbc0780caeb48e72e0cce',
+  output: {
+    r: '0xd85fca015b71a79e76122b767b2442b8812a7eeb96379e78b05510afbb94921e',
+    s: '0x4e30e8a491f232f5218c254d4af6a5105be54da51b2b7993f8ad15f1b6425ecd',
+    _vs: '0xce30e8a491f232f5218c254d4af6a5105be54da51b2b7993f8ad15f1b6425ecd',
+    recoveryParam: 1,
+    v: 28,
+    yParityAndS: '0xce30e8a491f232f5218c254d4af6a5105be54da51b2b7993f8ad15f1b6425ecd',
+    compact:
+      '0xd85fca015b71a79e76122b767b2442b8812a7eeb96379e78b05510afbb94921ece30e8a491f232f5218c254d4af6a5105be54da51b2b7993f8ad15f1b6425ecd',
+  },
+};
+
 export const testData = [
   {
     inputs: {
