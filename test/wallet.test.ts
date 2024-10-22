@@ -7,10 +7,11 @@ import { ripemd160Token, sha256Token } from '../src/crypto/hashes/hashes';
 import { Wallet, PvtKeyWallet } from '../src/key/wallet';
 import { generateWalletFromMnemonic, generateWalletsFromMnemonic } from '../src/key/wallet-utils';
 import { EthWallet } from '../src/key/eth-wallet';
-import { chainInfos, mnemonic, referenceWallets } from './mockdata';
+import { chainInfos, ethSignTestData, mnemonic, referenceWallets } from './mockdata';
 import { sha256 } from '@noble/hashes/sha256';
 import { ripemd160 } from '@noble/hashes/ripemd160';
 import expect from 'expect.js';
+import { hex } from '@scure/base';
 
 beforeEach(() => {
   setBip39(Bip39);
@@ -30,6 +31,7 @@ describe('generateMnemonic', () => {
         paths: [path],
       });
       const accounts = wallet.getAccounts();
+
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       //@ts-ignore
       expect(accounts[0]?.address).to.be(referenceWallets.ref1.addresses[key]);
@@ -48,6 +50,10 @@ describe('generateMnemonic', () => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       expect(accounts[0]?.address).to.be(referenceWallets.ref1.addresses[key]);
+      if (accounts[0]) {
+        const signature = wallet.sign(accounts[0].address, hex.decode(ethSignTestData.input));
+        expect(signature.compact).equal(ethSignTestData.output.compact);
+      }
     }
   });
 
