@@ -4,7 +4,7 @@
   "description": "A javascript library for crypto key management",
   "scripts": {
     "test": "nyc mocha",
-    "lint:prettier": "prettier . --ignore-pattern",
+    "lint:prettier": "prettier .",
     "lint:prettier:check": "yarn lint:prettier -c",
     "lint:prettier:fix": "yarn lint:prettier -w",
     "lint:eslint": "eslint .",
