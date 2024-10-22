@@ -36,7 +36,7 @@
     "leap wallet"
   ],
   "engines": {
-    "node": "16"
+    "node": "18"
   },
   "author": "Leap Wallet <admin@leapwallet.io> (https://leapwallet.io)",
   "bugs": "https://github.com/leapwallet/leap-keychain/issues",
@@ -113,6 +113,5 @@
   },
   "resolutions": {
     "protobufjs": "6.11.4"
-
   }
 }
