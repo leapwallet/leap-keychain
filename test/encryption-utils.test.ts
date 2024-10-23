@@ -1,5 +1,5 @@
 import { decrypt, encrypt } from '../src';
-import expect from 'expect.js'
+import expect from 'expect.js';
 
 describe('encryption-utils', () => {
   it('encrypt-decrypt-2', () => {
