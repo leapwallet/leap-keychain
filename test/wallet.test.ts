@@ -12,6 +12,7 @@ import { sha256 } from '@noble/hashes/sha256';
 import { ripemd160 } from '@noble/hashes/ripemd160';
 import expect from 'expect.js';
 import { hex } from '@scure/base';
+import { getFullHDPath } from '../src';
 
 beforeEach(() => {
   setBip39(Bip39);
@@ -22,10 +23,13 @@ beforeEach(() => {
 
 describe('generateMnemonic', () => {
   it('generates wallet', () => {
-    const chainData = Object.entries(chainInfos).filter(([, chainInfo]) => chainInfo.coinType !== 60);
+    const chainData = Object.entries(chainInfos).filter(
+      ([, chainInfo]) => chainInfo.coinType !== 60 && chainInfo.coinType !== 0,
+    );
 
     for (const [key, chainInfo] of chainData) {
-      const path = `m/44'/${chainInfo.coinType}'/0'/0/0`;
+      const coinType = chainInfo.useBip84 ? '84' : '44';
+      const path = getFullHDPath(coinType, chainInfo.coinType.toString(), '0', '0');
       const wallet = Wallet.generateWallet(mnemonic, {
         addressPrefix: chainInfo.addressPrefix,
         paths: [path],
