@@ -1,3 +1,5 @@
+import { NETWORK, TEST_NETWORK } from '@scure/btc-signer';
+
 export const mnemonic = 'talk chat police leisure hill remember extra struggle treat utility before wine';
 export const privateKey = '0x8e754bd2427d31124df0f0717eb0d4289b87ca1f789d27e41b12523879aeecf1';
 export const addresses = {
@@ -7,18 +9,22 @@ export const addresses = {
   juno: 'juno1uput06d0xac525sdmtf4h5d8dy9d8x3uevnq9e',
   evmos: 'evmos1reqqp5jum0lgyjh33nyvus8dlyzspk9aw50w3r',
   injective: 'inj1reqqp5jum0lgyjh33nyvus8dlyzspk9axufyen',
+  bitcoin: 'bc1qd5xpfp9zp8q696pu3sz7ej2wrk2wn634dlnhfa',
+  signet: 'tb1qd5xpfp9zp8q696pu3sz7ej2wrk2wn6348egyjw',
 };
 
 export const referenceWallets = {
   ref1: {
     addressIndex: 0,
     addresses: {
+      bitcoin: 'bc1qd5xpfp9zp8q696pu3sz7ej2wrk2wn634dlnhfa',
       cosmos: 'cosmos1nqcal4r4qgfj9hhazrfpu72fx0ccdv35w698a3',
       evmos: 'evmos142nmc3rtuu40ehtdvpqlmgphhrx6ndyndrtjky',
       injective: 'inj142nmc3rtuu40ehtdvpqlmgphhrx6ndyn9tdc75',
       juno: 'juno1nqcal4r4qgfj9hhazrfpu72fx0ccdv35cgxu6d',
       osmosis: 'osmo1nqcal4r4qgfj9hhazrfpu72fx0ccdv35xpkhtr',
       secret: 'secret1gcf3qag3zf0k9sd759ttuuq287p00g4kewjdwc',
+      signet: 'tb1qd5xpfp9zp8q696pu3sz7ej2wrk2wn6348egyjw',
     },
     colorIndex: 0,
     name: 'testwallet',
@@ -29,6 +35,8 @@ export const referenceWallets = {
       juno: 'AwxYytPNgUq91tLoRiGBP6MGEcsghnVTeMcLKcoPSfjW',
       osmosis: 'AwxYytPNgUq91tLoRiGBP6MGEcsghnVTeMcLKcoPSfjW',
       secret: 'AnQhTZmbQZXa9MY3KhYdEE1OabdLBtEAbG/wgj0SzBEV',
+      bitcoin: 'AjQmZKXn3epwg10mUNuHUF1SxWLS+06AA1v4um9x8//2',
+      signet: 'AjQmZKXn3epwg10mUNuHUF1SxWLS+06AA1v4um9x8//2',
     },
     walletType: 0,
   },
@@ -41,6 +49,8 @@ export const referenceWallets = {
       juno: 'juno1rjtukzmqtlh2u20atc9pjefk55y0h6j2jv7syw',
       osmosis: 'osmo1rjtukzmqtlh2u20atc9pjefk55y0h6j2v9wm4q',
       secret: 'secret1v7pzm2xdytc75dxx893fnd4te80qh6nw2k9czh',
+      bitcoin: 'bc1qpx6cas6wg4gtpcmfke626va4kpx9m4s5cx03ff',
+      signet: 'tb1qpx6cas6wg4gtpcmfke626va4kpx9m4s5jq5zj6',
     },
     colorIndex: 1,
     name: 'Wallet 2',
@@ -51,6 +61,8 @@ export const referenceWallets = {
       juno: 'AqYABZ4+Zqqbx7zZfctmtRQs882J15WfRz3Go9QggsIA',
       osmosis: 'AqYABZ4+Zqqbx7zZfctmtRQs882J15WfRz3Go9QggsIA',
       secret: 'AlvxQlaPKJI+25bX8I6TD6EaGbZl1f6Ngu/E9nO4KZCn',
+      bitcoin: 'A3hQ226XkTCvpEXC3KqxLEZANyNjyMmJhIm8rDwX/EKE',
+      signet: 'A3hQ226XkTCvpEXC3KqxLEZANyNjyMmJhIm8rDwX/EKE',
     },
     walletType: 0,
   },
@@ -63,6 +75,8 @@ export const addressPrefixes = {
   juno: 'juno',
   evmos: 'evmos',
   injective: 'inj',
+  bitcoin: 'bc1q',
+  signet: 'tb1q',
 };
 
 export const coinTypes = {
@@ -72,9 +86,14 @@ export const coinTypes = {
   secret: 529,
   evmos: 60,
   injective: 60,
+  bitcoin: 0,
+  signet: 0,
 };
 
-export const chainInfos = {
+export const chainInfos: Record<
+  string,
+  { addressPrefix: string; coinType: number; useBip84?: boolean; btcNetwork?: typeof NETWORK }
+> = {
   cosmos: {
     addressPrefix: addressPrefixes.cosmos,
     coinType: coinTypes.cosmos,
@@ -98,6 +117,18 @@ export const chainInfos = {
   osmosis: {
     addressPrefix: addressPrefixes.osmosis,
     coinType: coinTypes.osmosis,
+  },
+  bitcoin: {
+    addressPrefix: addressPrefixes.bitcoin,
+    coinType: coinTypes.bitcoin,
+    useBip84: true,
+    btcNetwork: NETWORK,
+  },
+  signet: {
+    addressPrefix: addressPrefixes.signet,
+    coinType: coinTypes.bitcoin,
+    useBip84: true,
+    btcNetwork: TEST_NETWORK,
   },
 };
 

@@ -70,7 +70,6 @@ describe('keychain', () => {
     });
 
     const key = storageObj['keystore'][_key.id];
-
     expect(key.addresses).to.eql(ref1.addresses);
     expect(key.pubKeys).to.eql(ref1.pubKeys);
     expect(key.name).to.eql(ref1.name);

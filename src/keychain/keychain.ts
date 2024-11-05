@@ -1,5 +1,5 @@
 import { EthWallet } from '../key/eth-wallet';
-import getHDPath from '../utils/get-hdpath';
+import getHDPath, { getFullHDPath } from '../utils/get-hdpath';
 import { PvtKeyWallet } from '../key/wallet';
 
 import { Container } from 'typedi';
@@ -11,6 +11,8 @@ import { ChainInfo, CreateWalletParams, Key, Keystore, WALLETTYPE } from '../typ
 import { compressedPublicKey, generateWalletFromMnemonic, generateWalletsFromMnemonic } from '../key/wallet-utils';
 import { convertAddress } from '../utils/bech32-address-converter';
 import { Input } from '@noble/ciphers/utils';
+import { BtcWallet } from '../key/btc-wallet';
+import { NETWORK } from '@scure/btc-signer';
 
 export const KEYCHAIN = 'keystore';
 export const ENCRYPTED_KEYCHAIN = 'encrypted-keystore';
@@ -110,17 +112,26 @@ export class KeyChain {
     const addresses: Record<string, string> = {};
     const pubKeys: Record<string, string> = {};
     for (const chainInfo of chainInfos) {
-      const wallet =
-        chainInfo.coinType === '60'
-          ? EthWallet.generateWalletFromPvtKey(privateKey, {
-              paths: [getHDPath('60', '0')],
-              addressPrefix: chainInfo.addressPrefix,
-            })
-          : await PvtKeyWallet.generateWallet(privateKey, chainInfo.addressPrefix);
-      const [account] = await wallet.getAccounts();
-      if (account) {
+      let wallet;
+      if (chainInfo.coinType === '60') {
+        wallet = EthWallet.generateWalletFromPvtKey(privateKey, {
+          paths: [getHDPath('60', '0')],
+          addressPrefix: chainInfo.addressPrefix,
+        });
+      } else if (chainInfo.coinType === '1') {
+        if (!chainInfo.btcNetwork)
+          throw new Error('Unable to generate key. Please provide btc network in chain info config');
+        wallet = BtcWallet.generateWalletFromPrivKey(privateKey, {
+          paths: [getFullHDPath('84', '1', '0')],
+          addressPrefix: chainInfo.addressPrefix,
+          network: chainInfo.btcNetwork,
+        });
+      } else {
+        wallet = PvtKeyWallet.generateWallet(privateKey, chainInfo.addressPrefix);
+      }
+      const [account] = wallet.getAccounts();
+      if (account && account.address && account.pubkey) {
         addresses[chainInfo.key] = account.address;
-
         pubKeys[chainInfo.key] = compressedPublicKey(account.pubkey);
       }
     }
@@ -213,11 +224,13 @@ export class KeyChain {
       coinType,
       ethWallet,
       pubKeyBech32Address,
+      btcNetwork,
     }: {
       addressPrefix: string;
       coinType: string;
       ethWallet?: boolean;
       pubKeyBech32Address?: boolean;
+      btcNetwork?: typeof NETWORK;
     },
   ) {
     const storage = Container.get(storageToken);
@@ -240,7 +253,13 @@ export class KeyChain {
       return PvtKeyWallet.generateWallet(secret, addressPrefix);
     } else {
       const hdPath = getHDPath(coinType, walletData.addressIndex.toString());
-      return generateWalletFromMnemonic(secret, { hdPath, addressPrefix, ethWallet: !!ethWallet, pubKeyBech32Address });
+      return generateWalletFromMnemonic(secret, {
+        hdPath,
+        addressPrefix,
+        ethWallet: !!ethWallet,
+        pubKeyBech32Address,
+        btcNetwork,
+      });
     }
   }
 
@@ -286,11 +305,7 @@ export class KeyChain {
     }
   }
 
-  private static async getAddresses(
-    mnemonic: string,
-    addressIndex: number,
-    chainInfos: { coinType: string; addressPrefix: string; key: string }[],
-  ) {
+  private static async getAddresses(mnemonic: string, addressIndex: number, chainInfos: Array<ChainInfo>) {
     try {
       const chainsData = chainInfos;
       const addresses: Record<string, string> = {};
@@ -299,15 +314,17 @@ export class KeyChain {
 
       for (const chainInfo of chainsData) {
         const coinTypeKey = coinTypeKeys[chainInfo.coinType];
-        if (coinTypeKey) {
+        if (coinTypeKey && !chainInfo.useBip84) {
           addresses[chainInfo.key] = convertAddress(coinTypeKey.address, chainInfo.addressPrefix);
           pubKeys[chainInfo.key] = coinTypeKey.pubkey;
           continue;
         }
+        const purpose = chainInfo.useBip84 ? '84' : '44';
         const wallet = generateWalletFromMnemonic(mnemonic, {
-          hdPath: getHDPath(chainInfo.coinType, addressIndex.toString()),
+          hdPath: getFullHDPath(purpose, chainInfo.coinType, addressIndex.toString()),
           addressPrefix: chainInfo.addressPrefix,
           ethWallet: false,
+          btcNetwork: chainInfo.btcNetwork,
         });
 
         const [account] = wallet.getAccounts();
