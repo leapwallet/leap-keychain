@@ -5,6 +5,7 @@
   "scripts": {
     "test:coverage": "nyc mocha",
     "test": "mocha",
+    "lint:prettier": "yarn prettier .",
     "lint:prettier:check": "yarn lint:prettier -c",
     "lint:prettier:fix": "yarn lint:prettier -w",
     "lint:eslint": "eslint .",
