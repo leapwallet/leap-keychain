@@ -2,7 +2,7 @@ import { getBip32, IChildKey, IHDKey } from '../crypto/bip32/hdwallet-token';
 import { getBip39 } from '../crypto/bip39/bip39-token';
 import { WalletOptions } from '../types/wallet';
 import { p2wpkh, Transaction, NETWORK } from '@scure/btc-signer';
-import { hex } from '@scure/base';
+import { base64 } from '@scure/base';
 import { HDKey } from '@scure/bip32';
 export type BTCWalletOptions = WalletOptions & { network: typeof NETWORK };
 
@@ -55,14 +55,26 @@ export class BtcWallet {
   }
 
   signPsbt(address: string, psbt: string) {
-    const psbtBytes = hex.decode(psbt);
+    const psbtBytes = base64.decode(psbt);
     const tx = Transaction.fromPSBT(psbtBytes);
     const accounts = this.getAccountsWithPrivKey();
     const account = accounts.find((account) => account.address === address);
     if (!account) throw new Error(`No account found for ${address}`);
     if (!account.childKey.privateKey) throw new Error('Private key not found');
+    return {
+      tx,
+      signTx: () => {
+        if (!account.childKey.privateKey) throw new Error('Private key not found');
+        tx.sign(account.childKey.privateKey);
+      },
+    };
+  }
 
-    const signedTx = tx.sign(account.childKey.privateKey);
-    return signedTx;
+  signIdx(address: string, tx: Transaction, idx: number) {
+    const accounts = this.getAccountsWithPrivKey();
+    const account = accounts.find((account) => account.address === address);
+    if (!account) throw new Error(`No account found for ${address}`);
+    if (!account.childKey.privateKey) throw new Error('Private key not found');
+    tx.signIdx(account.childKey.privateKey, idx);
   }
 }

@@ -19,4 +19,4 @@ export * from './utils/init-crypto';
 export * from './key/wallet-utils';
 export * from './utils/get-hdpath';
 
-export { NETWORK, TEST_NETWORK } from '@scure/btc-signer';
+export { NETWORK, TEST_NETWORK, Transaction } from '@scure/btc-signer';

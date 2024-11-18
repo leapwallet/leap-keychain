@@ -252,7 +252,8 @@ export class KeyChain {
       }
       return PvtKeyWallet.generateWallet(secret, addressPrefix);
     } else {
-      const hdPath = getHDPath(coinType, walletData.addressIndex.toString());
+      const purpose = coinType === '0' ? '84' : '44';
+      const hdPath = getFullHDPath(purpose, coinType, walletData.addressIndex.toString());
       return generateWalletFromMnemonic(secret, {
         hdPath,
         addressPrefix,
