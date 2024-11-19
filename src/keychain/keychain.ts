@@ -8,7 +8,12 @@ import { storageToken } from '../storage/storage-layer';
 import { v4 as uuidv4 } from 'uuid';
 import { correctMnemonic } from '../utils/correct-mnemonic';
 import { ChainInfo, CreateWalletParams, Key, Keystore, WALLETTYPE } from '../types/keychain';
-import { compressedPublicKey, generateWalletFromMnemonic, generateWalletsFromMnemonic } from '../key/wallet-utils';
+import {
+  compressedPublicKey,
+  generateWalletFromMnemonic,
+  generateWalletFromPrivateKey,
+  generateWalletsFromMnemonic,
+} from '../key/wallet-utils';
 import { convertAddress } from '../utils/bech32-address-converter';
 import { Input } from '@noble/ciphers/utils';
 import { BtcWalletPk } from '../key/btc-wallet';
@@ -112,23 +117,10 @@ export class KeyChain {
     const addresses: Record<string, string> = {};
     const pubKeys: Record<string, string> = {};
     for (const chainInfo of chainInfos) {
-      let wallet;
-      if (chainInfo.coinType === '60') {
-        wallet = EthWallet.generateWalletFromPvtKey(privateKey, {
-          paths: [getHDPath('60', '0')],
-          addressPrefix: chainInfo.addressPrefix,
-        });
-      } else if (chainInfo.coinType === '0') {
-        if (!chainInfo.btcNetwork)
-          throw new Error('Unable to generate key. Please provide btc network in chain info config');
-        wallet = new BtcWalletPk(privateKey, {
-          paths: [getFullHDPath('84', '0', '0')],
-          addressPrefix: chainInfo.addressPrefix,
-          network: chainInfo.btcNetwork,
-        });
-      } else {
-        wallet = PvtKeyWallet.generateWallet(privateKey, chainInfo.addressPrefix);
-      }
+      const prefix = chainInfo.addressPrefix;
+      const purpose = chainInfo.useBip84 ? '84' : '44';
+      const hdPath = getFullHDPath(purpose, chainInfo.coinType);
+      let wallet = generateWalletFromPrivateKey(privateKey, hdPath, prefix, chainInfo.btcNetwork);
       const [account] = wallet.getAccounts();
       if (account && account.address && account.pubkey) {
         addresses[chainInfo.key] = account.address;

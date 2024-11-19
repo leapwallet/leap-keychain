@@ -1,10 +1,10 @@
 import Container from 'typedi';
 import { secp256k1Token } from '../crypto/ecc/secp256k1';
 import { EthWallet } from './eth-wallet';
-import { Wallet } from './wallet';
+import { PvtKeyWallet, Wallet } from './wallet';
 import * as base64js from 'base64-js';
 import { bip39Token } from '../crypto/bip39/bip39-token';
-import { BtcWalletHD } from './btc-wallet';
+import { BtcWalletHD, BtcWalletPk } from './btc-wallet';
 import { NETWORK } from '@scure/btc-signer';
 
 /***
@@ -92,4 +92,31 @@ export function generateWalletsFromMnemonic(
 export function compressedPublicKey(publicKey: Uint8Array) {
   const secp256k1 = Container.get(secp256k1Token);
   return base64js.fromByteArray(secp256k1.publicKeyConvert(publicKey, true));
+}
+
+export function generateWalletFromPrivateKey(
+  privateKey: string,
+  hdPath: string,
+  prefix: string,
+  btcNetwork?: typeof NETWORK,
+) {
+  const hdPathParams = hdPath.split('/');
+  const coinType = hdPathParams[2];
+  let wallet;
+  if (coinType === "60'") {
+    wallet = EthWallet.generateWalletFromPvtKey(privateKey, {
+      paths: [hdPath],
+      addressPrefix: prefix,
+    });
+  } else if (coinType === "0'") {
+    if (!btcNetwork) throw new Error('Unable to generate key. Please provide btc network in chain info config');
+    wallet = new BtcWalletPk(privateKey, {
+      paths: [hdPath],
+      addressPrefix: prefix,
+      network: btcNetwork,
+    });
+  } else {
+    wallet = PvtKeyWallet.generateWallet(privateKey, prefix);
+  }
+  return wallet;
 }
