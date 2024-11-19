@@ -4,7 +4,7 @@ import { EthWallet } from './eth-wallet';
 import { Wallet } from './wallet';
 import * as base64js from 'base64-js';
 import { bip39Token } from '../crypto/bip39/bip39-token';
-import { BtcWallet } from './btc-wallet';
+import { BtcWalletHD } from './btc-wallet';
 import { NETWORK } from '@scure/btc-signer';
 
 /***
@@ -48,7 +48,7 @@ export function generateWalletFromMnemonic(
       return EthWallet.generateWalletFromMnemonic(mnemonic, { paths: [hdPath], addressPrefix, pubKeyBech32Address });
     case "0'": {
       if (!btcNetwork) throw new Error('Cannot create btc wallet. Please provide network');
-      return BtcWallet.generateWalletFromMnemonic(mnemonic, { paths: [hdPath], addressPrefix, network: btcNetwork });
+      return BtcWalletHD.generateWalletFromMnemonic(mnemonic, { paths: [hdPath], addressPrefix, network: btcNetwork });
     }
     default:
       return Wallet.generateWallet(mnemonic, { paths: [hdPath], addressPrefix });
@@ -60,7 +60,7 @@ export function generateWalletsFromMnemonic(
   paths: string[],
   prefix: string,
   btcNetwork?: typeof NETWORK,
-): Wallet | EthWallet | BtcWallet {
+): Wallet | EthWallet | BtcWalletHD {
   const bip39 = Container.get(bip39Token);
   bip39.mnemonicToEntropy(mnemonic);
   const coinTypes = paths.map((hdPath) => {
@@ -82,7 +82,7 @@ export function generateWalletsFromMnemonic(
       return EthWallet.generateWalletFromMnemonic(mnemonic, { paths, addressPrefix: prefix });
     case '0': {
       if (!btcNetwork) throw new Error('Cannot create btc wallet. Please provide network');
-      return BtcWallet.generateWalletFromMnemonic(mnemonic, { paths, addressPrefix: prefix, network: btcNetwork });
+      return BtcWalletHD.generateWalletFromMnemonic(mnemonic, { paths, addressPrefix: prefix, network: btcNetwork });
     }
     default:
       return Wallet.generateWallet(mnemonic, { paths, addressPrefix: prefix });
