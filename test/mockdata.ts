@@ -2,6 +2,8 @@ import { NETWORK, TEST_NETWORK } from '@scure/btc-signer';
 
 export const mnemonic = 'talk chat police leisure hill remember extra struggle treat utility before wine';
 export const privateKey = '0x8e754bd2427d31124df0f0717eb0d4289b87ca1f789d27e41b12523879aeecf1';
+export const btcPrivatekey = 'a29da5e16cf8a7a4fe90dc9287c3338e6726b8bd4c1e9a8ab40d87200de08ffb';
+
 export const addresses = {
   secret: 'secret18qya73yjlt28hhc3yefu3j97kgpyjj9rfd46d6',
   cosmos: 'cosmos1uput06d0xac525sdmtf4h5d8dy9d8x3u07smz9',

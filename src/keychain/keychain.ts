@@ -11,7 +11,7 @@ import { ChainInfo, CreateWalletParams, Key, Keystore, WALLETTYPE } from '../typ
 import { compressedPublicKey, generateWalletFromMnemonic, generateWalletsFromMnemonic } from '../key/wallet-utils';
 import { convertAddress } from '../utils/bech32-address-converter';
 import { Input } from '@noble/ciphers/utils';
-import { BtcWallet } from '../key/btc-wallet';
+import { BtcWalletPk } from '../key/btc-wallet';
 import { NETWORK } from '@scure/btc-signer';
 
 export const KEYCHAIN = 'keystore';
@@ -118,11 +118,11 @@ export class KeyChain {
           paths: [getHDPath('60', '0')],
           addressPrefix: chainInfo.addressPrefix,
         });
-      } else if (chainInfo.coinType === '1') {
+      } else if (chainInfo.coinType === '0') {
         if (!chainInfo.btcNetwork)
           throw new Error('Unable to generate key. Please provide btc network in chain info config');
-        wallet = BtcWallet.generateWalletFromPrivKey(privateKey, {
-          paths: [getFullHDPath('84', '1', '0')],
+        wallet = new BtcWalletPk(privateKey, {
+          paths: [getFullHDPath('84', '0', '0')],
           addressPrefix: chainInfo.addressPrefix,
           network: chainInfo.btcNetwork,
         });
@@ -249,6 +249,13 @@ export class KeyChain {
       if (coinType === '60' || ethWallet) {
         const hdPath = getHDPath(coinType, walletData.addressIndex.toString());
         return EthWallet.generateWalletFromPvtKey(secret, { paths: [hdPath], addressPrefix, pubKeyBech32Address });
+      } else if (coinType === '0') {
+        if (!btcNetwork) throw new Error('Cannot create btc wallet. Please provide network');
+        return new BtcWalletPk(secret, {
+          paths: [getHDPath(coinType, walletData.addressIndex.toString())],
+          addressPrefix,
+          network: btcNetwork,
+        });
       }
       return PvtKeyWallet.generateWallet(secret, addressPrefix);
     } else {
