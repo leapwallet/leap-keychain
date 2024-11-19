@@ -1,5 +1,6 @@
 export * from './key/wallet';
 export * from './key/eth-wallet';
+export * from './key/btc-wallet';
 export * from './utils/encode-signature';
 export * from './utils/encoding';
 export * from './utils/serialize-signdoc';
