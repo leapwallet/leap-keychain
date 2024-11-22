@@ -46,7 +46,8 @@ export function generateWalletFromMnemonic(
   switch (coinType) {
     case "60'":
       return EthWallet.generateWalletFromMnemonic(mnemonic, { paths: [hdPath], addressPrefix, pubKeyBech32Address });
-    case "0'": {
+    case "0'":
+    case "1'": {
       if (!btcNetwork) throw new Error('Cannot create btc wallet. Please provide network');
       return BtcWalletHD.generateWalletFromMnemonic(mnemonic, { paths: [hdPath], addressPrefix, network: btcNetwork });
     }
@@ -80,7 +81,8 @@ export function generateWalletsFromMnemonic(
   switch (refCoinType) {
     case '60':
       return EthWallet.generateWalletFromMnemonic(mnemonic, { paths, addressPrefix: prefix });
-    case '0': {
+    case '0':
+    case '1': {
       if (!btcNetwork) throw new Error('Cannot create btc wallet. Please provide network');
       return BtcWalletHD.generateWalletFromMnemonic(mnemonic, { paths, addressPrefix: prefix, network: btcNetwork });
     }
@@ -108,7 +110,7 @@ export function generateWalletFromPrivateKey(
       paths: [hdPath],
       addressPrefix: prefix,
     });
-  } else if (coinType === "0'") {
+  } else if (coinType === "0'" || coinType === "1'") {
     if (!btcNetwork) throw new Error('Unable to generate key. Please provide btc network in chain info config');
     wallet = new BtcWalletPk(privateKey, {
       paths: [hdPath],

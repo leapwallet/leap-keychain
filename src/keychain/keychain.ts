@@ -1,5 +1,5 @@
 import { EthWallet } from '../key/eth-wallet';
-import getHDPath, { getFullHDPath } from '../utils/get-hdpath';
+import getHDPath, { getFullHDPath, isBtcCoinType } from '../utils/get-hdpath';
 import { PvtKeyWallet } from '../key/wallet';
 
 import { Container } from 'typedi';
@@ -241,7 +241,7 @@ export class KeyChain {
       if (coinType === '60' || ethWallet) {
         const hdPath = getHDPath(coinType, walletData.addressIndex.toString());
         return EthWallet.generateWalletFromPvtKey(secret, { paths: [hdPath], addressPrefix, pubKeyBech32Address });
-      } else if (coinType === '0') {
+      } else if (isBtcCoinType(coinType)) {
         if (!btcNetwork) throw new Error('Cannot create btc wallet. Please provide network');
         return new BtcWalletPk(secret, {
           paths: [getHDPath(coinType, walletData.addressIndex.toString())],
@@ -251,7 +251,7 @@ export class KeyChain {
       }
       return PvtKeyWallet.generateWallet(secret, addressPrefix);
     } else {
-      const purpose = coinType === '0' ? '84' : '44';
+      const purpose = isBtcCoinType(coinType) ? '84' : '44';
       const hdPath = getFullHDPath(purpose, coinType, walletData.addressIndex.toString());
       return generateWalletFromMnemonic(secret, {
         hdPath,

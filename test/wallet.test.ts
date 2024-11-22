@@ -24,7 +24,7 @@ beforeEach(() => {
 describe('generateMnemonic', () => {
   it('generates wallet', () => {
     const chainData = Object.entries(chainInfos).filter(
-      ([, chainInfo]) => chainInfo.coinType !== 60 && chainInfo.coinType !== 0,
+      ([, chainInfo]) => chainInfo.coinType !== 60 && chainInfo.coinType !== 0 && chainInfo.coinType !== 1,
     );
 
     for (const [key, chainInfo] of chainData) {
