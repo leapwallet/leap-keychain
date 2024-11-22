@@ -8,7 +8,7 @@ import { setBip39 } from '../src/crypto/bip39/bip39-token';
 import { ripemd160Token, sha256Token } from '../src/crypto/hashes/hashes';
 import { BtcWalletHD, BtcWalletPk } from '../src/key/btc-wallet';
 import expect from 'expect.js';
-import { addresses, btcPrivatekey, mnemonic } from './mockdata';
+import { addresses, btcPrivatekey, mnemonic, sbtcPrivatekey } from './mockdata';
 import { NETWORK, TEST_NETWORK } from '@scure/btc-signer';
 
 beforeEach(() => {
@@ -34,13 +34,13 @@ describe('generate btc wallet', () => {
   });
   it('generates correct signet wallet', () => {
     const wallet = BtcWalletHD.generateWalletFromMnemonic(mnemonic, {
-      addressPrefix: 'bc1q',
-      paths: ["m/84'/0'/0'/0/0"],
+      addressPrefix: 'tb1q',
+      paths: ["m/84'/1'/0'/0/0"],
       network: TEST_NETWORK,
     });
     const accounts = wallet.getAccountsWithPrivKey();
 
-    const expectedAccount = 'tb1qd5xpfp9zp8q696pu3sz7ej2wrk2wn6348egyjw';
+    const expectedAccount = addresses.signet;
     if (accounts[0]) {
       expect(accounts[0].address).to.be(expectedAccount);
     }
@@ -58,9 +58,9 @@ describe('generate btc wallet', () => {
   });
 
   it('generates correct signet wallet from private key', () => {
-    const wallet = new BtcWalletPk(btcPrivatekey, {
+    const wallet = new BtcWalletPk(sbtcPrivatekey, {
       addressPrefix: 'tb1q',
-      paths: ["m/84'/0'/0'/0/0"],
+      paths: ["m/84'/1'/0'/0/0"],
       network: TEST_NETWORK,
     });
 
