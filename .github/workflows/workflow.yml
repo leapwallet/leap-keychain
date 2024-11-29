@@ -1,4 +1,4 @@
-name: Release
+name: Build and Publish
 
 on:
   push:
@@ -64,7 +64,7 @@ jobs:
       - name: Publish to NPM
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
-          yarn publish --non-interactive
+          yarn publish --access public --non-interactive
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Setup GitHub Registry
