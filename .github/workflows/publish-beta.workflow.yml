@@ -8,7 +8,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: 16
+          node-version: 18
       - run: yarn
       - run: yarn lint:check
   test:
@@ -17,15 +17,10 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: 16
+          node-version: 18
       - run: yarn
-      - run: yarn test:coverage
+      - run: yarn test
 
-      - name: Comment Test Coverage
-        uses: raulanatol/jest-coverage-comment-action@main
-        with:
-          github-token: ${{ secrets.NODE_AUTH_TOKEN }}
-          use-existing-reports: true
   publish-npm-registry:
     if: github.ref == 'refs/heads/staging'
     needs: [lint, test]
@@ -34,7 +29,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
           registry-url: 'https://registry.npmjs.org'
       - run: yarn
       - run: yarn build
@@ -49,7 +44,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
           registry-url: 'https://npm.pkg.github.com'
           scope: '@leapwallet'
       - run: yarn

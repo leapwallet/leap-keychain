@@ -48,8 +48,8 @@ export class EthWallet {
   static generateWalletFromPvtKey(pvtKey: string, options: WalletOptions) {
     try {
       new Wallet(pvtKey);
-    } catch (e) {
-      throw new Error('Invalid private key');
+    } catch (e: any) {
+      throw new Error(`Invalid private key ${e.message}`);
     }
     return new EthWallet('', pvtKey.replace('0x', ''), 'pvtKey', options);
   }
@@ -127,7 +127,6 @@ export class EthWallet {
       throw new Error(`Address ${signerAddress} not found in wallet`);
     }
     const { ethWallet } = account;
-
     return ethWallet.signTransaction(transaction);
   }
 

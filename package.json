@@ -1,13 +1,14 @@
 {
   "name": "@leapwallet/leap-keychain",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "description": "A javascript library for crypto key management",
   "scripts": {
-    "test": "jest",
-    "lint:prettier": "prettier . --ignore-path .gitignore",
+    "test:coverage": "nyc mocha",
+    "test": "mocha",
+    "lint:prettier": "yarn prettier .",
     "lint:prettier:check": "yarn lint:prettier -c",
     "lint:prettier:fix": "yarn lint:prettier -w",
-    "lint:eslint": "eslint . --ignore-path .gitignore",
+    "lint:eslint": "eslint .",
     "lint:eslint:check": "yarn lint:eslint",
     "lint:eslint:fix": "yarn lint:eslint --fix",
     "lint:tsc": "tsc --noEmit",
@@ -19,61 +20,59 @@
     "doc:watch": "yarn doc --watch",
     "prepublish": "yarn build",
     "build": "tsc -p tsconfig-browser.json && tsc -p tsconfig-node.json",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "nyc"
   },
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node",
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "/dist/"
-    ]
-  },
-  "types": "dist/browser/src/index.d.ts",
+  "types": "dist/browser/index.d.ts",
   "license": "MIT",
   "repository": "leapwallet/leap-keychain",
   "keywords": [
     "leap wallet"
   ],
   "engines": {
-    "node": "16"
+    "node": "18"
   },
   "author": "Leap Wallet <admin@leapwallet.io> (https://leapwallet.io)",
   "bugs": "https://github.com/leapwallet/leap-keychain/issues",
   "homepage": "https://github.com/leapwallet/leap-keychain#readme",
   "files": [
-    "dist/browser/src/",
-    "dist/node/src/"
+    "dist/browser/",
+    "dist/node/"
   ],
-  "main": "dist/node/src/index.js",
-  "browser": "dist/browser/src/index.js",
+  "main": "dist/node/index.js",
+  "browser": "dist/browser/index.js",
   "dependencies": {
     "@ethersproject/bytes": "5.7.0",
     "@ethersproject/hdnode": "5.7.0",
     "@ethersproject/wallet": "5.7.0",
+    "@noble/ciphers": "0.5.3",
     "@noble/hashes": "1.1.5",
     "@noble/secp256k1": "1.7.0",
+    "@scure/base": "1.1.6",
     "@scure/bip32": "1.1.1",
+    "@scure/btc-signer": "^1.4.0",
     "base64-js": "1.5.1",
     "bech32": "2.0.0",
     "bip32": "2.0.6",
     "bip39": "3.0.4",
-    "cosmjs-types": "0.6.1",
-    "crypto-js": "4.1.1",
+    "cosmjs-types": "0.8.0",
     "ethereumjs-util": "7.1.5",
     "typedi": "0.10.0",
     "uuid": "9.0.0"
   },
   "devDependencies": {
     "@types/crypto-js": "4.1.1",
+    "@types/expect.js": "^0.3.32",
     "@types/jest": "28.1.4",
+    "@types/mocha": "^10.0.9",
     "@types/uuid": "^9.0.0",
-    "@typescript-eslint/eslint-plugin": "5.9.1",
-    "@typescript-eslint/parser": "5.9.1",
-    "eslint": "8.6.0",
-    "jest": "28.1.2",
+    "@typescript-eslint/eslint-plugin": "8.11.0",
+    "@typescript-eslint/parser": "8.11.0",
+    "eslint": "9.13.0",
+    "expect.js": "0.3.1",
+    "mocha": "10.7.3",
+    "nyc": "17.1.0",
     "prettier": "2.5.1",
-    "ts-jest": "28.0.5",
+    "ts-node": "10.9.2",
     "typedoc": "0.22.17",
     "typedoc-plugin-missing-exports": "1.0.0",
     "typescript": "4.7.3"
@@ -84,26 +83,10 @@
     "jsxSingleQuote": true,
     "trailingComma": "all"
   },
-  "eslintConfig": {
-    "env": {
-      "es6": true,
-      "jest": true
-    },
-    "extends": [
-      "eslint:recommended",
-      "plugin:@typescript-eslint/recommended"
-    ],
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-      "ecmaVersion": 6
-    },
-    "plugins": [
-      "@typescript-eslint"
-    ],
-    "rules": {
-      "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/no-non-null-assertion": "off",
-      "@typescript-eslint/no-namespace": "off"
-    }
+  "resolutions": {
+    "protobufjs": "6.11.4",
+    "semver": "7.6.0",
+    "braces": "3.0.3",
+    "secp256k1": "4.0.4"
   }
 }
