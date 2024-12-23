@@ -313,6 +313,12 @@ export class KeyChain {
       const coinTypeKeys: Record<string, { address: string; pubkey: string }> = {};
 
       for (const chainInfo of chainsData) {
+        if (chainInfo.customKeygenfn) {
+          const key = await chainInfo.customKeygenfn();
+          addresses[chainInfo.key] = key.address;
+          pubKeys[chainInfo.key] = key.pubkey;
+          continue;
+        }
         const coinTypeKey = coinTypeKeys[chainInfo.coinType];
         if (coinTypeKey && !chainInfo.useBip84) {
           addresses[chainInfo.key] = convertAddress(coinTypeKey.address, chainInfo.addressPrefix);
