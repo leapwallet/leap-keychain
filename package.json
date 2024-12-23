@@ -1,6 +1,6 @@
 {
   "name": "@leapwallet/leap-keychain",
-  "version": "0.3.0",
+  "version": "0.3.3-beta.0",
   "description": "A javascript library for crypto key management",
   "scripts": {
     "test:coverage": "nyc mocha",

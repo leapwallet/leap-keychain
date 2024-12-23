@@ -1,22 +1,26 @@
+name: Build and Publish
+
 on:
   push:
     branches: [main]
   pull_request:
+
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 18
       - run: yarn
       - run: yarn lint:check
+
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 18
       - run: yarn
@@ -27,13 +31,13 @@ jobs:
     needs: [lint, test]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 18
       - run: yarn
       - run: yarn doc:build
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: docs
           path: docs/
@@ -42,7 +46,8 @@ jobs:
           build_dir: docs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  publish-npm-registry:
+
+  publish:
     if: github.ref == 'refs/heads/main'
     needs: [lint, test]
     runs-on: ubuntu-latest
@@ -52,39 +57,41 @@ jobs:
         with:
           node-version: 18
           registry-url: 'https://registry.npmjs.org'
-      - run: yarn
-      - run: yarn build
-      - run: yarn publish
+      - name: Install dependencies
+        run: yarn
+      - name: Build
+        run: yarn build
+      - name: Publish to NPM
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
+          yarn publish --access public --non-interactive
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-  publish-github-registry:
-    if: github.ref == 'refs/heads/main'
-    needs: [lint, test]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Setup GitHub Registry
+        uses: actions/setup-node@v3
         with:
           node-version: 18
           registry-url: 'https://npm.pkg.github.com'
           scope: '@leapwallet'
-      - run: yarn
-      - run: yarn build
-      - run: yarn publish --non-interactive
+      - name: Publish to GitHub Registry
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > .npmrc
+          yarn publish --non-interactive
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   github-release:
     if: github.ref == 'refs/heads/main'
-    needs: host-docs
+    needs: [host-docs, publish]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v4
         with:
           name: docs
           path: docs/
       - run: zip -r docs.zip docs/
-      - name: Set $VERSION
+      - name: Set VERSION
         run: echo "VERSION=$(yarn env | grep npm_package_version | grep -Eo '[0-9.]*')" >> $GITHUB_ENV
       - name: Release
         env:

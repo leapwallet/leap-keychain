@@ -340,6 +340,27 @@ export class KeyChain {
     }
   }
 
+  static async AddEntry<T extends string>(walletId: string, entry: { key: T; address: string; pubkey: string }) {
+    const storage = Container.get(storageToken);
+    const keystore: Keystore<T> = await storage.get(KEYCHAIN);
+    const wallet = keystore[walletId];
+    const activeWallet: Key<T> = await storage.get(ACTIVE_WALLET);
+    if (!wallet) throw new Error('Wallet not found');
+    wallet.addresses[entry.key] = entry.address;
+    if (wallet.pubKeys) {
+      wallet.pubKeys[entry.key] = entry.pubkey;
+    }
+    if (activeWallet && activeWallet.id === walletId) {
+      activeWallet.addresses[entry.key] = entry.address;
+      if (activeWallet.pubKeys) {
+        activeWallet.pubKeys[entry.key] = entry.pubkey;
+      }
+      await storage.set(ACTIVE_WALLET, activeWallet);
+    }
+    keystore[walletId] = wallet;
+    await storage.set(KEYCHAIN, keystore);
+  }
+
   private static isWalletAlreadyPresent<T extends string>(address: string, wallets: Key<T>[]) {
     return wallets.find((wallet) => Object.values(wallet.addresses).includes(address)) !== undefined;
   }
