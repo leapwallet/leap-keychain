@@ -36,7 +36,7 @@ export type ChainInfo = {
   coinType: string;
   useBip84?: boolean;
   btcNetwork?: typeof NETWORK;
-  customKeygenfn?: () => Promise<{
+  customKeygenfn?: (key: string, path: string) => Promise<{
     address: string;
     pubkey: string
   }>
