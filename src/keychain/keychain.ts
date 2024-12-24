@@ -118,7 +118,7 @@ export class KeyChain {
     const pubKeys: Record<string, string> = {};
     for (const chainInfo of chainInfos) {
       if (chainInfo.customKeygenfn) {
-        const key = await chainInfo.customKeygenfn(privateKey, getFullHDPath('44', chainInfo.coinType));
+        const key = await chainInfo.customKeygenfn(privateKey, getFullHDPath('44', chainInfo.coinType), 'privateKey');
         addresses[chainInfo.key] = key.address;
         pubKeys[chainInfo.key] = key.pubkey;
         continue;
@@ -324,6 +324,7 @@ export class KeyChain {
           const key = await chainInfo.customKeygenfn(
             mnemonic,
             getFullHDPath(purpose, chainInfo.coinType, addressIndex.toString()),
+            'seedPhrase',
           );
           addresses[chainInfo.key] = key.address;
           pubKeys[chainInfo.key] = key.pubkey;
