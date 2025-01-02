@@ -10,6 +10,8 @@ import { BtcWalletHD, BtcWalletPk } from '../src/key/btc-wallet';
 import expect from 'expect.js';
 import { addresses, btcPrivatekey, mnemonic, sbtcPrivatekey } from './mockdata';
 import { NETWORK, TEST_NETWORK } from '@scure/btc-signer';
+import { base64 } from '@scure/base';
+import { compressSignature } from '../src/utils/encode-signature';
 
 beforeEach(() => {
   setBip39(Bip39);
@@ -67,5 +69,23 @@ describe('generate btc wallet', () => {
     const accounts = wallet.getAccounts();
     if (!accounts[0]) throw new Error('No accounts found');
     expect(accounts[0].address).to.be(addresses.signet);
+  });
+
+  it('signEcdsa: generates correct signature', () => {
+    const wallet = BtcWalletHD.generateWalletFromMnemonic(mnemonic, {
+      addressPrefix: 'bc1q',
+      paths: ["m/84'/0'/0'/0/0"],
+      network: NETWORK,
+    });
+    const [account] = wallet.getAccounts();
+    if (!account) throw new Error();
+
+    const testHash = 'lZ93LI3uk73n7jGU4os1GIWkEz/4vf//AhBR2m5M/9A=';
+
+    const fixture = 'IBU1VH1HFZKtulCFAukOm3JP8QO4ldrqxVohbhY5Qt8YFAxG85AanlP4qPjnOfDlkWGUUTan1gAVad1KcG2FifQ=';
+
+    const { signature, recoveryParam } = wallet.signECDSA(account.address, base64.decode(testHash));
+    const base64Signature = compressSignature(recoveryParam, signature);
+    expect(base64Signature).to.equal(fixture);
   });
 });

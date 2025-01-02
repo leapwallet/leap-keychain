@@ -23,3 +23,12 @@ export function encodeSecp256k1Pubkey(pubkey: Uint8Array): Pubkey {
     value: base64js.fromByteArray(pubkey),
   };
 }
+
+export function compressSignature(recoveryParam: number, signature: Uint8Array) {
+  if (!(recoveryParam === 0 || recoveryParam === 1 || recoveryParam === 2 || recoveryParam === 3)) {
+    throw new Error('recoveryParam must be equal to 0, 1, 2, or 3');
+  }
+
+  let headerByte = recoveryParam + 27 + 4;
+  return Buffer.concat([Uint8Array.of(headerByte), Uint8Array.from(signature)]).toString('base64');
+}
