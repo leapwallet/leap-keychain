@@ -6,13 +6,14 @@ export const btcPrivatekey = 'a29da5e16cf8a7a4fe90dc9287c3338e6726b8bd4c1e9a8ab4
 export const sbtcPrivatekey = 'acc42e2d3fb504915180bae5d001e818f3304b970b2a145ebc252faf2fbd8867';
 
 export const addresses = {
-  secret: 'secret18qya73yjlt28hhc3yefu3j97kgpyjj9rfd46d6',
+  bitcoin: 'bc1qd5xpfp9zp8q696pu3sz7ej2wrk2wn634dlnhfa',
   cosmos: 'cosmos1uput06d0xac525sdmtf4h5d8dy9d8x3u07smz9',
-  osmosis: 'osmo1uput06d0xac525sdmtf4h5d8dy9d8x3u89rt5h',
-  juno: 'juno1uput06d0xac525sdmtf4h5d8dy9d8x3uevnq9e',
   evmos: 'evmos1reqqp5jum0lgyjh33nyvus8dlyzspk9aw50w3r',
   injective: 'inj1reqqp5jum0lgyjh33nyvus8dlyzspk9axufyen',
-  bitcoin: 'bc1qd5xpfp9zp8q696pu3sz7ej2wrk2wn634dlnhfa',
+  juno: 'juno1uput06d0xac525sdmtf4h5d8dy9d8x3uevnq9e',
+  osmosis: 'osmo1uput06d0xac525sdmtf4h5d8dy9d8x3u89rt5h',
+  secret: 'secret18qya73yjlt28hhc3yefu3j97kgpyjj9rfd46d6',
+  sei: 'sei1nqcal4r4qgfj9hhazrfpu72fx0ccdv35rk53ms',
   signet: 'tb1qp63mr992cpwspcjnysdfhstj6jaqykrs64yywn',
 };
 
@@ -27,18 +28,20 @@ export const referenceWallets = {
       juno: 'juno1nqcal4r4qgfj9hhazrfpu72fx0ccdv35cgxu6d',
       osmosis: 'osmo1nqcal4r4qgfj9hhazrfpu72fx0ccdv35xpkhtr',
       secret: 'secret1gcf3qag3zf0k9sd759ttuuq287p00g4kewjdwc',
+      sei: 'sei1nqcal4r4qgfj9hhazrfpu72fx0ccdv35rk53ms',
       signet: 'tb1qp63mr992cpwspcjnysdfhstj6jaqykrs64yywn',
     },
     colorIndex: 0,
     name: 'testwallet',
     pubKeys: {
+      bitcoin: 'AjQmZKXn3epwg10mUNuHUF1SxWLS+06AA1v4um9x8//2',
       cosmos: 'AwxYytPNgUq91tLoRiGBP6MGEcsghnVTeMcLKcoPSfjW',
       evmos: 'A71glojh4VpiwcFufLabwSTfkLB6lnJ3i6EAp7oOac0h',
       injective: 'A71glojh4VpiwcFufLabwSTfkLB6lnJ3i6EAp7oOac0h',
       juno: 'AwxYytPNgUq91tLoRiGBP6MGEcsghnVTeMcLKcoPSfjW',
       osmosis: 'AwxYytPNgUq91tLoRiGBP6MGEcsghnVTeMcLKcoPSfjW',
       secret: 'AnQhTZmbQZXa9MY3KhYdEE1OabdLBtEAbG/wgj0SzBEV',
-      bitcoin: 'AjQmZKXn3epwg10mUNuHUF1SxWLS+06AA1v4um9x8//2',
+      sei: 'AwxYytPNgUq91tLoRiGBP6MGEcsghnVTeMcLKcoPSfjW',
       signet: 'AuLI5ATf2xgkFbHojyMsSQ2qbnvZoVyfu9JACxiZz8ji',
     },
     walletType: 0,
@@ -46,28 +49,54 @@ export const referenceWallets = {
   ref2: {
     addressIndex: 1,
     addresses: {
+      bitcoin: 'bc1qpx6cas6wg4gtpcmfke626va4kpx9m4s5cx03ff',
       cosmos: 'cosmos1rjtukzmqtlh2u20atc9pjefk55y0h6j2y7atrj',
       evmos: 'evmos1wdlne45wt60w68pu08u2w9cyzamxglz79npune',
       injective: 'inj1wdlne45wt60w68pu08u2w9cyzamxglz7dm8kmf',
       juno: 'juno1rjtukzmqtlh2u20atc9pjefk55y0h6j2jv7syw',
       osmosis: 'osmo1rjtukzmqtlh2u20atc9pjefk55y0h6j2v9wm4q',
       secret: 'secret1v7pzm2xdytc75dxx893fnd4te80qh6nw2k9czh',
-      bitcoin: 'bc1qpx6cas6wg4gtpcmfke626va4kpx9m4s5cx03ff',
+      sei: 'sei1rjtukzmqtlh2u20atc9pjefk55y0h6j2fjva9n',
       signet: 'tb1qh9d6qr7twdk7dh5tsw7mqxl5yvxskrcs80gppq',
     },
     colorIndex: 1,
     name: 'Wallet 2',
     pubKeys: {
+      bitcoin: 'A3hQ226XkTCvpEXC3KqxLEZANyNjyMmJhIm8rDwX/EKE',
       cosmos: 'AqYABZ4+Zqqbx7zZfctmtRQs882J15WfRz3Go9QggsIA',
       evmos: 'AiuOnXAg+hvUimpEDchQfP9NmiKxgw1WaXpnQL/dvDMS',
       injective: 'AiuOnXAg+hvUimpEDchQfP9NmiKxgw1WaXpnQL/dvDMS',
       juno: 'AqYABZ4+Zqqbx7zZfctmtRQs882J15WfRz3Go9QggsIA',
       osmosis: 'AqYABZ4+Zqqbx7zZfctmtRQs882J15WfRz3Go9QggsIA',
       secret: 'AlvxQlaPKJI+25bX8I6TD6EaGbZl1f6Ngu/E9nO4KZCn',
-      bitcoin: 'A3hQ226XkTCvpEXC3KqxLEZANyNjyMmJhIm8rDwX/EKE',
+      sei: 'AqYABZ4+Zqqbx7zZfctmtRQs882J15WfRz3Go9QggsIA',
       signet: 'A0Ygge2Va8zePPPtwVyb8dt5Lf5fH9SvPxUdVylD5+cC',
     },
     walletType: 0,
+  },
+};
+
+export const evmAddresses = [
+  {
+    addressIndex: 0,
+    address: '0xaaa7bc446be72afcdd6d6041fda037b8cda9b493',
+  },
+  {
+    addressIndex: 1,
+    address: '0x737f3cd68e5e9eed1c3c79f8a717041776647c5e',
+  },
+];
+
+export const altEvmAddresses = {
+  sei: {
+    '0': {
+      coinType: '118',
+      address: '0x84a07314cd082feaacbc49487eede93cba01ea00',
+    },
+    '1': {
+      coinType: '118',
+      address: '0x5b6a94c44843091692650719d95fee49081919fa',
+    },
   },
 };
 
@@ -80,12 +109,14 @@ export const addressPrefixes = {
   injective: 'inj',
   bitcoin: 'bc1q',
   signet: 'tb1q',
+  sei: 'sei',
 };
 
 export const coinTypes = {
   cosmos: 118,
   juno: 118,
   osmosis: 118,
+  sei: 118,
   secret: 529,
   evmos: 60,
   injective: 60,
@@ -95,8 +126,21 @@ export const coinTypes = {
 
 export const chainInfos: Record<
   string,
-  { addressPrefix: string; coinType: number; useBip84?: boolean; btcNetwork?: typeof NETWORK }
+  {
+    addressPrefix: string;
+    coinType: number;
+    useBip84?: boolean;
+    btcNetwork?: typeof NETWORK;
+    ethWallet?: boolean;
+    pubKeyBech32Address?: boolean;
+  }
 > = {
+  bitcoin: {
+    addressPrefix: addressPrefixes.bitcoin,
+    coinType: coinTypes.bitcoin,
+    useBip84: true,
+    btcNetwork: NETWORK,
+  },
   cosmos: {
     addressPrefix: addressPrefixes.cosmos,
     coinType: coinTypes.cosmos,
@@ -113,19 +157,19 @@ export const chainInfos: Record<
     addressPrefix: addressPrefixes.juno,
     coinType: coinTypes.juno,
   },
-  secret: {
-    addressPrefix: addressPrefixes.secret,
-    coinType: coinTypes.secret,
-  },
   osmosis: {
     addressPrefix: addressPrefixes.osmosis,
     coinType: coinTypes.osmosis,
   },
-  bitcoin: {
-    addressPrefix: addressPrefixes.bitcoin,
-    coinType: coinTypes.bitcoin,
-    useBip84: true,
-    btcNetwork: NETWORK,
+  secret: {
+    addressPrefix: addressPrefixes.secret,
+    coinType: coinTypes.secret,
+  },
+  sei: {
+    addressPrefix: addressPrefixes.sei,
+    coinType: coinTypes.sei,
+    ethWallet: true,
+    pubKeyBech32Address: true,
   },
   signet: {
     addressPrefix: addressPrefixes.signet,
