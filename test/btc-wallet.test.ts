@@ -71,7 +71,7 @@ describe('generate btc wallet', () => {
     expect(accounts[0].address).to.be(addresses.signet);
   });
 
-  it('signEcdsa: generates correct signature', () => {
+  it('signEcdsa: generates correct signature', async () => {
     const wallet = BtcWalletHD.generateWalletFromMnemonic(mnemonic, {
       addressPrefix: 'bc1q',
       paths: ["m/84'/0'/0'/0/0"],
@@ -84,7 +84,7 @@ describe('generate btc wallet', () => {
 
     const fixture = 'IBU1VH1HFZKtulCFAukOm3JP8QO4ldrqxVohbhY5Qt8YFAxG85AanlP4qPjnOfDlkWGUUTan1gAVad1KcG2FifQ=';
 
-    const { signature, recoveryParam } = wallet.signECDSA(account.address, base64.decode(testHash));
+    const { signature, recoveryParam } = await wallet.signECDSA(account.address, base64.decode(testHash));
     const base64Signature = compressSignature(recoveryParam, signature);
     expect(base64Signature).to.equal(fixture);
   });
