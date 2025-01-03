@@ -36,6 +36,14 @@ export type ChainInfo = {
   coinType: string;
   useBip84?: boolean;
   btcNetwork?: typeof NETWORK;
+  customKeygenfn?: (
+    key: string,
+    path: string,
+    keyType: 'privateKey' | 'seedPhrase',
+  ) => Promise<{
+    address: string;
+    pubkey: string;
+  }>;
 };
 
 export type GetSignerParams = {

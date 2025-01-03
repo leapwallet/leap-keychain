@@ -9,3 +9,13 @@ export function getFullHDPath(purpose = '44', coinType = '0', index = '0', accou
 export function isBtcCoinType(coinType: string) {
   return coinType === '1' || coinType === '0';
 }
+
+export function getHardenedPath(path: string) {
+  const segments = path.split('/');
+  const hardenedSegments = segments.map((segment) => {
+    if (segment === 'm' || segment === '') return segment;
+    if (segment.endsWith("'")) return segment;
+    return segment + "'";
+  });
+  return hardenedSegments.join('/');
+}

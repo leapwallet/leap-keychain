@@ -117,6 +117,12 @@ export class KeyChain {
     const addresses: Record<string, string> = {};
     const pubKeys: Record<string, string> = {};
     for (const chainInfo of chainInfos) {
+      if (chainInfo.customKeygenfn) {
+        const key = await chainInfo.customKeygenfn(privateKey, getFullHDPath('44', chainInfo.coinType), 'privateKey');
+        addresses[chainInfo.key] = key.address;
+        pubKeys[chainInfo.key] = key.pubkey;
+        continue;
+      }
       const prefix = chainInfo.addressPrefix;
       const purpose = chainInfo.useBip84 ? '84' : '44';
       const hdPath = getFullHDPath(purpose, chainInfo.coinType);
@@ -313,13 +319,23 @@ export class KeyChain {
       const coinTypeKeys: Record<string, { address: string; pubkey: string }> = {};
 
       for (const chainInfo of chainsData) {
+        const purpose = chainInfo.useBip84 ? '84' : '44';
+        if (chainInfo.customKeygenfn) {
+          const key = await chainInfo.customKeygenfn(
+            mnemonic,
+            getFullHDPath(purpose, chainInfo.coinType, addressIndex.toString()),
+            'seedPhrase',
+          );
+          addresses[chainInfo.key] = key.address;
+          pubKeys[chainInfo.key] = key.pubkey;
+          continue;
+        }
         const coinTypeKey = coinTypeKeys[chainInfo.coinType];
         if (coinTypeKey && !chainInfo.useBip84) {
           addresses[chainInfo.key] = convertAddress(coinTypeKey.address, chainInfo.addressPrefix);
           pubKeys[chainInfo.key] = coinTypeKey.pubkey;
           continue;
         }
-        const purpose = chainInfo.useBip84 ? '84' : '44';
         const wallet = generateWalletFromMnemonic(mnemonic, {
           hdPath: getFullHDPath(purpose, chainInfo.coinType, addressIndex.toString()),
           addressPrefix: chainInfo.addressPrefix,
@@ -338,6 +354,27 @@ export class KeyChain {
     } catch (e) {
       throw new Error((e as Error).message);
     }
+  }
+
+  static async AddEntry<T extends string>(walletId: string, entry: { key: T; address: string; pubkey: string }) {
+    const storage = Container.get(storageToken);
+    const keystore: Keystore<T> = await storage.get(KEYCHAIN);
+    const wallet = keystore[walletId];
+    const activeWallet: Key<T> = await storage.get(ACTIVE_WALLET);
+    if (!wallet) throw new Error('Wallet not found');
+    wallet.addresses[entry.key] = entry.address;
+    if (wallet.pubKeys) {
+      wallet.pubKeys[entry.key] = entry.pubkey;
+    }
+    if (activeWallet && activeWallet.id === walletId) {
+      activeWallet.addresses[entry.key] = entry.address;
+      if (activeWallet.pubKeys) {
+        activeWallet.pubKeys[entry.key] = entry.pubkey;
+      }
+      await storage.set(ACTIVE_WALLET, activeWallet);
+    }
+    keystore[walletId] = wallet;
+    await storage.set(KEYCHAIN, keystore);
   }
 
   private static isWalletAlreadyPresent<T extends string>(address: string, wallets: Key<T>[]) {
