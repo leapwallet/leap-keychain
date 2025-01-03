@@ -101,24 +101,26 @@ export function generateWalletFromPrivateKey(
   hdPath: string,
   prefix: string,
   btcNetwork?: typeof NETWORK,
+  ethWallet?: boolean,
+  pubKeyBech32Address?: boolean,
 ) {
   const hdPathParams = hdPath.split('/');
   const coinType = hdPathParams[2];
-  let wallet;
-  if (coinType === "60'") {
-    wallet = EthWallet.generateWalletFromPvtKey(privateKey, {
+
+  if (coinType === "60'" || ethWallet) {
+    return EthWallet.generateWalletFromPvtKey(privateKey, {
       paths: [hdPath],
       addressPrefix: prefix,
+      pubKeyBech32Address,
     });
   } else if (coinType === "0'" || coinType === "1'") {
     if (!btcNetwork) throw new Error('Unable to generate key. Please provide btc network in chain info config');
-    wallet = new BtcWalletPk(privateKey, {
+    return new BtcWalletPk(privateKey, {
       paths: [hdPath],
       addressPrefix: prefix,
       network: btcNetwork,
     });
   } else {
-    wallet = PvtKeyWallet.generateWallet(privateKey, prefix);
+    return PvtKeyWallet.generateWallet(privateKey, prefix);
   }
-  return wallet;
 }
