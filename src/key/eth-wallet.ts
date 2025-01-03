@@ -14,6 +14,7 @@ import { SignDoc } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
 import { TransactionRequest, Provider } from '@ethersproject/abstract-provider';
 import Container from 'typedi';
 import { pubkeyToAddress } from './wallet';
+import { hex } from '@scure/base';
 
 export class EthWallet {
   private constructor(
@@ -84,7 +85,20 @@ export class EthWallet {
         algo: 'ethsecp256k1',
         address: bech32Address,
         ethWallet: ethWallet,
+        hexAddress: `0x${hex.encode(ethAddr)}`,
         pubkey,
+      };
+    });
+  }
+
+  public getAccountWithHexAddress() {
+    const accounts = this.getAccountsWithPrivKey();
+    return accounts.map((account) => {
+      return {
+        algo: account.algo,
+        address: account.hexAddress,
+        pubkey: account.pubkey,
+        bech32Address: account.address,
       };
     });
   }
