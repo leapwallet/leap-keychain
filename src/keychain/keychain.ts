@@ -157,7 +157,7 @@ export class KeyChain {
       },
     };
 
-    KeyChain.updateKeyChain(wallet);
+    await KeyChain.updateKeyChain(wallet);
     return wallet[walletId]!;
   }
 
