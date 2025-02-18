@@ -53,7 +53,7 @@ export class KeyChain {
       walletType: type === 'create' ? WALLETTYPE.SEED_PHRASE : WALLETTYPE.SEED_PHRASE_IMPORTED,
       id: walletId,
       colorIndex: colorIndex,
-      createdAt: new Date().toISOString(),
+      createdAt: Date.now(),
     };
 
     await KeyChain.updateKeyChain<T>({
@@ -99,7 +99,7 @@ export class KeyChain {
       walletType: WALLETTYPE.SEED_PHRASE,
       id: walletId,
       colorIndex: colorIndex ?? addressIndex,
-      createdAt: new Date().toISOString(),
+      createdAt: Date.now(),
     } as Key<T>;
 
     const keystoreEntry: { [id: string]: Key<T> } = {
@@ -156,7 +156,7 @@ export class KeyChain {
         walletType: WALLETTYPE.PRIVATE_KEY,
         id: walletId,
         colorIndex: lastIndex,
-        createdAt: new Date().toISOString(),
+        createdAt: Date.now(),
       },
     };
 
