@@ -40,7 +40,7 @@ export class KeyChain {
     const { addresses, pubKeys } = await KeyChain.getAddresses(mnemonic, addressIndex, chainInfos);
     const walletId = uuidv4();
 
-    if (KeyChain.isWalletAlreadyPresent(Object.values(addresses)[0] ?? '', walletsData)) {
+    if (Object.values(addresses).some((address) => KeyChain.isWalletAlreadyPresent(address, walletsData))) {
       throw new Error('Wallet already present');
     }
 
