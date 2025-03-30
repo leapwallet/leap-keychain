@@ -140,7 +140,7 @@ export class KeyChain {
     const walletsData = Object.values(allWallets ?? {});
     const lastIndex = walletsData.length;
 
-    if (KeyChain.isWalletAlreadyPresent(Object.values(addresses)[0] ?? '', walletsData)) {
+    if (Object.values(addresses).some((address) => KeyChain.isWalletAlreadyPresent(address, walletsData))) {
       throw new Error('Wallet already present');
     }
 
