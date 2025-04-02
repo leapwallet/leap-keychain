@@ -35,12 +35,14 @@ export class KeyChain {
     type,
   }: CreateWalletParams): Promise<Key<T>> {
     const allWallets = (await KeyChain.getAllWallets()) ?? {};
-    const walletsData = Object.values(allWallets);
+    const walletsData = Object.values(allWallets)?.filter((wallet) =>
+      [WALLETTYPE.SEED_PHRASE, WALLETTYPE.SEED_PHRASE_IMPORTED].includes(wallet.walletType),
+    );
 
     const { addresses, pubKeys } = await KeyChain.getAddresses(mnemonic, addressIndex, chainInfos);
     const walletId = uuidv4();
 
-    if (KeyChain.isWalletAlreadyPresent(Object.values(addresses)[0] ?? '', walletsData)) {
+    if (Object.values(addresses).some((address) => KeyChain.isWalletAlreadyPresent(address, walletsData))) {
       throw new Error('Wallet already present');
     }
 
@@ -140,7 +142,7 @@ export class KeyChain {
     const walletsData = Object.values(allWallets ?? {});
     const lastIndex = walletsData.length;
 
-    if (KeyChain.isWalletAlreadyPresent(Object.values(addresses)[0] ?? '', walletsData)) {
+    if (Object.values(addresses).some((address) => KeyChain.isWalletAlreadyPresent(address, walletsData))) {
       throw new Error('Wallet already present');
     }
 
