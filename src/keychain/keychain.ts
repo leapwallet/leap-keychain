@@ -35,7 +35,9 @@ export class KeyChain {
     type,
   }: CreateWalletParams): Promise<Key<T>> {
     const allWallets = (await KeyChain.getAllWallets()) ?? {};
-    const walletsData = Object.values(allWallets);
+    const walletsData = Object.values(allWallets)?.filter((wallet) =>
+      [WALLETTYPE.SEED_PHRASE, WALLETTYPE.SEED_PHRASE_IMPORTED].includes(wallet.walletType),
+    );
 
     const { addresses, pubKeys } = await KeyChain.getAddresses(mnemonic, addressIndex, chainInfos);
     const walletId = uuidv4();
