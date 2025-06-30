@@ -16,6 +16,7 @@ export type Key<T extends string> = {
   walletType: WALLETTYPE;
   id: string;
   colorIndex: number;
+  createdAt?: number;
 };
 
 export type Keystore<T extends string> = Record<string, Key<T>>;

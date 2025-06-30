@@ -35,12 +35,14 @@ export class KeyChain {
     type,
   }: CreateWalletParams): Promise<Key<T>> {
     const allWallets = (await KeyChain.getAllWallets()) ?? {};
-    const walletsData = Object.values(allWallets);
+    const walletsData = Object.values(allWallets)?.filter((wallet) =>
+      [WALLETTYPE.SEED_PHRASE, WALLETTYPE.SEED_PHRASE_IMPORTED].includes(wallet.walletType),
+    );
 
     const { addresses, pubKeys } = await KeyChain.getAddresses(mnemonic, addressIndex, chainInfos);
     const walletId = uuidv4();
 
-    if (KeyChain.isWalletAlreadyPresent(Object.values(addresses)[0] ?? '', walletsData)) {
+    if (Object.values(addresses).some((address) => KeyChain.isWalletAlreadyPresent(address, walletsData))) {
       throw new Error('Wallet already present');
     }
 
@@ -53,6 +55,7 @@ export class KeyChain {
       walletType: type === 'create' ? WALLETTYPE.SEED_PHRASE : WALLETTYPE.SEED_PHRASE_IMPORTED,
       id: walletId,
       colorIndex: colorIndex,
+      createdAt: Date.now(),
     };
 
     await KeyChain.updateKeyChain<T>({
@@ -98,6 +101,7 @@ export class KeyChain {
       walletType: WALLETTYPE.SEED_PHRASE,
       id: walletId,
       colorIndex: colorIndex ?? addressIndex,
+      createdAt: Date.now(),
     } as Key<T>;
 
     const keystoreEntry: { [id: string]: Key<T> } = {
@@ -138,7 +142,7 @@ export class KeyChain {
     const walletsData = Object.values(allWallets ?? {});
     const lastIndex = walletsData.length;
 
-    if (KeyChain.isWalletAlreadyPresent(Object.values(addresses)[0] ?? '', walletsData)) {
+    if (Object.values(addresses).some((address) => KeyChain.isWalletAlreadyPresent(address, walletsData))) {
       throw new Error('Wallet already present');
     }
 
@@ -154,10 +158,11 @@ export class KeyChain {
         walletType: WALLETTYPE.PRIVATE_KEY,
         id: walletId,
         colorIndex: lastIndex,
+        createdAt: Date.now(),
       },
     };
 
-    KeyChain.updateKeyChain(wallet);
+    await KeyChain.updateKeyChain(wallet);
     return wallet[walletId]!;
   }
 

@@ -1,8 +1,7 @@
 import { WalletOptions } from '../types/wallet';
 import { Wallet } from '@ethersproject/wallet';
-import { Address as EthereumUtilsAddress } from 'ethereumjs-util/dist/address';
+
 import { bech32 } from 'bech32';
-import { keccak256 } from 'ethereumjs-util';
 import * as bytes from '@ethersproject/bytes';
 import { fromHex } from '../utils/encoding';
 import { StdSignDoc } from '../types/tx';
@@ -15,6 +14,8 @@ import { TransactionRequest, Provider } from '@ethersproject/abstract-provider';
 import Container from 'typedi';
 import { pubkeyToAddress } from './wallet';
 import { hex } from '@scure/base';
+import { keccak256 } from '@ethersproject/keccak256';
+import { getAddress } from '@ethersproject/address';
 
 export class EthWallet {
   private constructor(
@@ -67,25 +68,29 @@ export class EthWallet {
   }
 
   private getAccountsWithPrivKey() {
-    const bip39 = getBip39();
-    const seed = bip39.mnemonicToSeedSync(this.mnemonic);
+    let seed: Uint8Array;
+    if (this.walletType === 'mnemonic') {
+      const bip39 = getBip39();
+      seed = bip39.mnemonicToSeedSync(this.mnemonic);
+    }
+
     return this.options.paths.map((path) => {
       const hdWallet =
         this.walletType === 'mnemonic' ? HDNode.fromSeed(seed).derivePath(path) : new Wallet(this.pvtKey);
 
-      const ethAddr = EthereumUtilsAddress.fromString(hdWallet.address).toBuffer();
+      const ethAddr = getAddress(hdWallet.address).replace('0x', '').toLowerCase();
 
       const ethWallet = new Wallet(hdWallet.privateKey, this.provider);
       const pubkey = fromHex(ethWallet._signingKey().compressedPublicKey.replace('0x', ''));
 
       const bech32Address = this.options.pubKeyBech32Address
         ? pubkeyToAddress(this.options.addressPrefix, pubkey)
-        : bech32.encode(this.options.addressPrefix, bech32.toWords(ethAddr));
+        : bech32.encode(this.options.addressPrefix, bech32.toWords(hex.decode(ethAddr)));
       return {
         algo: 'ethsecp256k1',
         address: bech32Address,
         ethWallet: ethWallet,
-        hexAddress: `0x${hex.encode(ethAddr)}`,
+        hexAddress: `0x${ethAddr}`,
         pubkey,
       };
     });
