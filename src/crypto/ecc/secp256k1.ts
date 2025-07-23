@@ -5,16 +5,17 @@ export namespace Secp256k1 {
   export function getPublicKey(privateKey: Uint8Array, compressed: boolean): Uint8Array {
     return _Secp256k1.getPublicKey(privateKey, compressed);
   }
-  export function sign(
+  export async function sign(
     message: Uint8Array,
     privateKey: Uint8Array,
     options?: { canonical: boolean; extraEntropy?: true },
   ): Promise<Uint8Array> {
-    return _Secp256k1.sign(message, privateKey, {
-      canonical: options?.canonical,
+    const signature = await _Secp256k1.signAsync(message, privateKey, {
       extraEntropy: options?.extraEntropy,
-      der: false,
+      lowS: true,
     });
+
+    return signature.toBytes();
   }
 
   export function publicKeyConvert(publicKey: Uint8Array, compressed: boolean): Uint8Array {
