@@ -70,7 +70,7 @@
     "mocha": "10.7.3",
     "nyc": "17.1.0",
     "prettier": "2.5.1",
-    "ts-node": "10.9.2",
+    "tsx": "4.20.3",
     "typedoc": "0.28.7",
     "typedoc-plugin-missing-exports": "1.0.0",
     "typescript": "5.8.3",
