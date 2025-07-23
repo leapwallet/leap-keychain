@@ -28,7 +28,7 @@
     "leap wallet"
   ],
   "engines": {
-    "node": "18"
+    "node": "22"
   },
   "author": "Leap Wallet <admin@leapwallet.io> (https://leapwallet.io)",
   "bugs": "https://github.com/leapwallet/leap-keychain/issues",
