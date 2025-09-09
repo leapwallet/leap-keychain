@@ -6,7 +6,7 @@ import { base64, hex } from '@scure/base';
 import Container from 'typedi';
 import { secp256k1Token } from '../crypto/ecc/secp256k1';
 import { P2Ret } from '@scure/btc-signer/payment';
-import { sign } from '@noble/secp256k1';
+import { signAsync } from '@noble/secp256k1';
 export type BTCWalletOptions = WalletOptions & { network: typeof NETWORK };
 
 export abstract class BtcWallet {
@@ -56,14 +56,12 @@ export abstract class BtcWallet {
     const accounts = this.getAccountsWithPrivKey();
     const account = accounts.find((account) => account.address === address);
     if (!account) throw new Error(`No account found for ${address}`);
-    const [signature, recoveryParam] = await sign(hash, account.privateKey, {
-      canonical: true,
-      recovered: true,
-      der: false,
+    const signature = await signAsync(hash, account.privateKey, {
+      lowS: true,
     });
     return {
-      signature,
-      recoveryParam,
+      signature: signature.toBytes(),
+      recoveryParam: signature.recovery,
     };
   }
 }
