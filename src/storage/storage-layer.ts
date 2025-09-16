@@ -1,5 +1,9 @@
 import Container, { Token } from 'typedi';
 
+/**
+ * Storage layer interface for keystore operations.
+ * Provides methods to get, set, and remove keystore data from storage.
+ */
 export type StorageLayer = {
   /**
    * @description Get the keystore from the storage
